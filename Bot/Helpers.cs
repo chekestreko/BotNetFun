@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-using Discord.Commands;
+using Discord.Addons.Interactive;
 
 namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
     using BotNetFun.Loot.MetaItem;
 
-    public sealed partial class InternalWorkings : ModuleBase<SocketCommandContext>
+    public sealed partial class InternalWorkings : InteractiveBase
     {
         private string SaveJson
         {
@@ -26,7 +26,7 @@ namespace BotNetFun.Bot
         private async Task<bool> HasInitialized()
         {
             string file = await File.ReadAllTextAsync(SaveJson);
-            return file.Contains("Health");
+            return file.Contains("Class");
         }
 
         private async Task StarterSavefileIntegrity()
@@ -66,6 +66,6 @@ namespace BotNetFun.Bot
             return retVal;
         }
 
-        private static Random rnd = new Random();
+        private static readonly Random rnd = new Random();
     }
 }

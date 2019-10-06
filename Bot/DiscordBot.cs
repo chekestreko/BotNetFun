@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using Discord;
+using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 
@@ -23,53 +24,57 @@ namespace BotNetFun.Bot
         {
             if (!Directory.Exists(Constants.SavePath))
                 Directory.CreateDirectory(Constants.SavePath);
-            await Bot.RunBot();
+            await Bot.RunBotClient();
         }
         
-
-        public IConfigurationRoot Configuration { get; }
-
         public DiscordBot()
         {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(Constants.SavePath);
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
             Configuration = builder.Build();
         }
 
         public DiscordSocketClient Client { get; set; }
         public CommandService CommandOperation { get; set; }
         public IServiceProvider Services { get; set; }
+        public IConfigurationRoot Configuration { get; }
 
-        public async Task RunBot()
+        public async Task RunBotClient()
         {
-            Client = new DiscordSocketClient(new DiscordSocketConfig {
+            Client = new DiscordSocketClient(new DiscordSocketConfig
+            {
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 2000,
                 ShardId = 1,
                 TotalShards = 1
             });
-            CommandOperation = new CommandService(new CommandServiceConfig {
+
+            CommandOperation = new CommandService(new CommandServiceConfig
+            {
                 LogLevel = LogSeverity.Verbose,
                 DefaultRunMode = RunMode.Async
-            }); 
+            });
 
             Services = new ServiceCollection()
                 .AddSingleton(Client)
                 .AddSingleton(CommandOperation)
                 .AddSingleton(Configuration)
+                .AddSingleton<InteractiveService>()
                 .BuildServiceProvider();
-            
-            Client.Log += arg => {
+
+            Client.Log += arg =>
+            {
                 Console.WriteLine(arg.ToString());
                 return Task.CompletedTask;
             };
-            
-            await RegisterCommandsAsync(); 
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XZkvYg.eUSlE6jl6H_hE3qz-L2EJSrWQSY"); 
-            await Client.StartAsync(); 
+
+            await RegisterCommandsAsync();
+            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XZpInw.h9eVSQaTyXoY8hXfqugNcsbNLes");
+            await Client.StartAsync();
             await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
             await Task.Delay(-1);
+                    
         }
 
         private async Task RegisterCommandsAsync()

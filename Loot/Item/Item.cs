@@ -16,12 +16,12 @@
         public ItemSet Set { get; private set; }
         public Item(
             string _name,
-            int _damage,
-            int _cc,
-            int _cd,
-            double _iv,
-            Rarity rare,
-            ItemType ty,
+            int _damage = 0,
+            int _cc = 0,
+            int _cd = 0,
+            double _iv = 0,
+            Rarity rare = Rarity.Common,
+            ItemType ty = ItemType.Primary,
             ItemBonus _bo = null,
             ItemSet _set = null
         )

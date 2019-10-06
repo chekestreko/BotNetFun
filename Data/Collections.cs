@@ -10,7 +10,6 @@ namespace BotNetFun.Data
     {
         static Collections()
         {
-
         }
 
         public static Dictionary<string, Item> Items { get; private set; } = new Dictionary<string, Item>();
