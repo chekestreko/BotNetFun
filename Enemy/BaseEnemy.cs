@@ -1,8 +1,10 @@
-﻿namespace BotNetFun.Enemy
-{
-    using BotNetFun.Loot;
+﻿using System.Collections.Generic;
 
-    internal abstract class Enemy
+namespace BotNetFun.Enemy
+{
+    using BotNetFun.Loot.MetaItem;
+
+    internal abstract class BaseEnemy
     {
         public string Name { get; protected set; }
         public int Health { get; protected set; }
@@ -13,9 +15,9 @@
         public int CritDamage { get; protected set; }
         public double GoldDrop { get; protected set; }
         public EnemyType EnemyType { get; protected set; }
-        public DropPool LootDropPool { get; protected set; }
+        public List<Item> LootDropPool { get; protected set; }
 
-        protected Enemy(
+        protected BaseEnemy(
             string _name,
             int _health,
             int _damage,
@@ -23,7 +25,7 @@
             int _cd,
             double _gd,
             EnemyType et,
-            DropPool dp
+            List<Item> dp
         )
         {
             Name = _name;

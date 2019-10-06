@@ -1,6 +1,6 @@
-﻿namespace BotNetFun.Loot.ItemEnums
+﻿namespace BotNetFun.Loot.Enums
 {
-    internal enum ItemRarity : byte
+    internal enum Rarity : byte
     {
         Trash = 0,
         Common = 1,
@@ -9,7 +9,7 @@
         Rare = 4,
         Epic = 5,
         Legendary = 6,
-        Relic = 7,
+        Fabled = 7,
         Mythical = 8,
         Extraordinary = 9,
         Developer = 255

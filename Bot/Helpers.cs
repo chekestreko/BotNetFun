@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
+using Discord.Commands;
+
+namespace BotNetFun.Bot
+{
+    using BotNetFun.Data;
+    using BotNetFun.Loot.MetaItem;
+
+    public sealed partial class InternalWorkings : ModuleBase<SocketCommandContext>
+    {
+        private string SaveJson
+        {
+            get => $"{Constants.SavePath + "/" + Context.User.Id}.json";
+        }
+
+        private async Task<double> XPToLevelUp()
+        {
+            double PlayerLevel = double.Parse(await JsonHandler.GetData("XP", SaveJson));
+            return (PlayerLevel * 12.7) + (PlayerLevel * PlayerLevel);
+        }
+
+        private async Task<bool> HasInitialized()
+        {
+            string file = await File.ReadAllTextAsync(SaveJson);
+            return file.Contains("Health");
+        }
+
+        private async Task StarterSavefileIntegrity()
+        {
+            if (!File.Exists(SaveJson))
+            {
+                File.CreateText(SaveJson);
+                await File.WriteAllTextAsync(SaveJson, "{}");
+            }
+        }
+
+        private async Task PlayerUpdate()
+        {
+            long MaxHealthCheck = long.Parse(await JsonHandler.GetData("MaxHealth", SaveJson));
+            if (long.Parse(await JsonHandler.GetData("Health", SaveJson)) > MaxHealthCheck)
+                await JsonHandler.WriteEntry("Health", MaxHealthCheck, SaveJson);
+        }
+
+        public T GetRandomFromDictionary<T>(Dictionary<string, T> dict) where T : class
+        {
+            List<T> enemyCollectionList = new List<T>();
+            foreach (KeyValuePair<string, T> vals in dict)
+            {
+                enemyCollectionList.Add(vals.Value);
+            }
+
+            lock (enemyCollectionList)
+            {
+                int rand = rnd.Next(enemyCollectionList.Count);
+                return enemyCollectionList[rand] as T;
+            }
+        }
+
+        private string GetItemInfo(Item item)
+        {
+            string retVal = $@"Item type: {Collections.ParseItemInfo(item) + Constants.NL}";
+            return retVal;
+        }
+
+        private static Random rnd = new Random();
+    }
+}

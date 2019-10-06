@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Discord;
 using Discord.Commands;
 
+using SnowynxHelpers.Extensions;
+
 namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
 
-    public sealed class Commands : ModuleBase<SocketCommandContext>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as a method via attribute")]
+    public sealed partial class InternalWorkings : ModuleBase<SocketCommandContext>
     {
-        #region Commands
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("forceexit")]
         [Alias("exit")]
@@ -26,25 +30,20 @@ namespace BotNetFun.Bot
         [Summary("Start your adventure!")]
         private async Task Start()
         {
-            if (!File.Exists(SaveJson))
-            {
-                File.CreateText(SaveJson);
-                await File.WriteAllTextAsync(SaveJson, "{}");
-            }
+            await StarterSavefileIntegrity();
             if (await HasInitialized())
             {
-                await ReplyAsync($"{Context.User.Username}, you already initialized. Use the **!help** command if you need help.");
+                await ReplyAsync($"{Context.User.Username}, you already initialized. Use the `.help` command if you need help.");
                 return;
             }
-            await JsonHandler.WriteEntry("created", "true", SaveJson);
-            await JsonHandler.WriteEntry("InBattle", "true", SaveJson);
+            await JsonHandler.WriteEntry("InBattle", "false", SaveJson);
             await JsonHandler.WriteEntry("MaxHealth", 10, SaveJson);
             await JsonHandler.WriteEntry("Health", 10, SaveJson);
             await JsonHandler.WriteEntry("Gold", 5, SaveJson);
             await JsonHandler.WriteEntry("DodgeChance", 5, SaveJson);
             await JsonHandler.WriteEntry("Defense", 5, SaveJson);
             await JsonHandler.WriteEntry("Level", 1, SaveJson);
-            await JsonHandler.WriteEntry("XP", 0 , SaveJson);
+            await JsonHandler.WriteEntry("XP", 0, SaveJson);
             await JsonHandler.WriteEntry("BaseDamage", 2, SaveJson);
             await JsonHandler.WriteEntry("BaseCriticalChance", 5, SaveJson);
             await JsonHandler.WriteEntry("BaseCriticalDamage", 25, SaveJson);
@@ -56,43 +55,65 @@ namespace BotNetFun.Bot
             await JsonHandler.WriteEntry("Primary", string.Empty, SaveJson);
             await JsonHandler.WriteEntry("Secondary", string.Empty, SaveJson);
             await JsonHandler.WriteEntry("Charm", string.Empty, SaveJson);
-            await JsonHandler.WriteEntry("Aura", string.Empty, SaveJson);
-            await JsonHandler.WriteEntry("Pet", string.Empty, SaveJson);
-            await ReplyAsync($"Welcome {Context.User.Username}! Use the **!help** command to get a list of commands!");
+            await ReplyAsync($"Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
+        }
+
+        [Command("encounter")]
+        [Alias("fight")]
+        [Summary("Fight a random enemy...")]
+        private async Task Encounter()
+        {
+            await StarterSavefileIntegrity();
+            if (!File.Exists(SaveJson))
+            {
+                File.CreateText(SaveJson);
+                await File.WriteAllTextAsync(SaveJson, "{}");
+            }
+            if (!await HasInitialized())
+            {
+                await ReplyAsync("Please use the `.start` command first to initialize.");
+                return;
+            }
+            await JsonHandler.WriteEntry("InBattle", "true", SaveJson);
+            Embed encounterMessage = new EmbedBuilder
+            {
+                Title = "Enemy Encounter",
+                Description = "Finding enemy to fight...",
+                Color = Color.Gold
+            }.Build();
+            IUserMessage message = await ReplyAsync(embed: encounterMessage);
+            /*
+            Dictionary<string, BaseEnemy> enemyCollection = Collections.Enemies;
+            BaseEnemy encounteredEnemy = GetRandomFromDictionary(enemyCollection); */
+            await Task.Delay(300);
+            await message.ModifyAsync(msg => msg.Embed = new EmbedBuilder {
+                Title = "Enemy found!",
+                Description = "Get ready!",
+                Color = Color.Red
+            }.Build());
+            await JsonHandler.WriteEntry("InBattle", "false", SaveJson);
         }
 
         [Command("help")]
         [Summary("Get a list of commands")]
         private async Task Help()
-        {
-            await ReplyAsync();
-        }
-        #endregion
+        { 
+            List<CommandInfo> commands = DiscordBot.Bot.CommandOperation.Commands.ToList();
+            EmbedBuilder embedBuilder = new EmbedBuilder {
+                Color = Color.Blue
+            }; 
 
-        #region Helpers
-        private string SaveJson
-        {
-            get => $"{Constants.SavePath + "/" + Context.User.Id}.json";
-        }
+            foreach (CommandInfo command in commands)
+            {
+                if ("forceexit" == command.Name.RemoveWhitespace()) continue;
+                if ("exit" == command.Name.RemoveWhitespace()) continue;
 
-        private async Task<double> XPToLevelUp()
-        {
-            double PlayerLevel = double.Parse(await JsonHandler.GetData("XP", SaveJson));
-            return (PlayerLevel * 7.7) + (PlayerLevel * PlayerLevel);
-        }
+                string embedFieldText = command.Summary ?? "No description available" + Constants.NL;
 
-        private async Task<bool> HasInitialized()
-        {
-            string text = await File.ReadAllTextAsync(SaveJson);
-            return text.Contains("created");
+                embedBuilder.AddField(command.Name, embedFieldText);
+            }
+
+            await ReplyAsync("List of commands: ", embed: embedBuilder.Build());
         }
-          
-        private async Task PlayerUpdate()
-        {
-            long MaxHealthCheck = long.Parse(await JsonHandler.GetData("MaxHealth", SaveJson));
-            if (long.Parse(await JsonHandler.GetData("Health", SaveJson)) > MaxHealthCheck)
-                await JsonHandler.WriteEntry("Health", MaxHealthCheck, SaveJson);
-        }
-        #endregion
     }
 }

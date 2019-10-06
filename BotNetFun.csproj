@@ -32,8 +32,7 @@
     <Folder Include="Loot\" />
     <Folder Include="Bot\" />
     <Folder Include="Data\" />
-    <Folder Include="Loot\Interfaces\" />
-    <Folder Include="Loot\Ability\" />
-    <Folder Include="Loot\ItemEnums\" />
+    <Folder Include="Loot\Enums\" />
+    <Folder Include="Loot\Item\" />
   </ItemGroup>
 </Project>
