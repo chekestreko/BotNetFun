@@ -7,7 +7,9 @@
 
   <Target Name="BeforeBuild">
     <ItemGroup>
-      <CustomConfigFile Include="$(OutputPath)SaveData/save.json" />
+      <CustomConfigFile Include="$(OutputPath)\SaveData\save.json" />
+    </ItemGroup>
+    <ItemGroup>
       <FileWrites Include="@(CustomConfigFile)" />
     </ItemGroup>
   </Target>
