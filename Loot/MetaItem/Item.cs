@@ -14,7 +14,7 @@
         public ItemType Type { get; private set; }
         public ItemBonus Bonus { get; private set; }
         public ItemSet Set { get; private set; }
-        public Item(
+        public Item (
             string _name,
             int _damage = 0,
             int _cc = 0,
@@ -36,5 +36,8 @@
             Bonus = _bo;
             Set = _set;
         }
+        
+        public static void CreateItem(string _n, int dmg, int cc, int cd, double iv, Rarity _rare, ItemType t, ItemBonus bo, ItemSet itset) 
+        => new Item(_n, _damage: dmg, _cc: cc, _cd: cd, _iv: iv, rare: _rare, ty: t, _bo: bo, _set: itset)
     }
 }

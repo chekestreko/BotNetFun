@@ -66,6 +66,6 @@ namespace BotNetFun.Bot
             return retVal;
         }
 
-        private static readonly Random rnd = new Random();
+        private readonly Random rnd = new Random();
     }
 }

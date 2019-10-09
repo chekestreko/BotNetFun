@@ -25,6 +25,14 @@ namespace BotNetFun.Bot
             Dictionary<string, string> savetext = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
             return savetext[property];
         }
+        
+        public static async Task<double> GetData(string property, string savePath)
+        {
+            property = property.RemoveWhitespace();
+            string data = await File.ReadAllTextAsync(savePath);
+            Dictionary<string, string> savetext = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+            return double.Parse(savetext[property]);
+        }
 
         #region WriteEntryNumberOverload
         public static async Task WriteEntry(string property, double val, string savePath)

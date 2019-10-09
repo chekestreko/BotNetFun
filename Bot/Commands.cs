@@ -27,7 +27,7 @@ namespace BotNetFun.Bot
             await ReplyAsync("Exiting! (exit code: 0)");
             Environment.Exit(0);
         }
-
+        // TODO: code cleanup
         [Command("start")]
         [Alias("initialize", "init")]
         [Summary("Start your adventure! (and with a starting class!)")]
@@ -147,7 +147,7 @@ namespace BotNetFun.Bot
                     break;
             }
         }
-
+        // TODO: actual encounter
         [Command("encounter")]
         [Alias("fight")]
         [Summary("Fight a random enemy...")]
@@ -182,7 +182,7 @@ namespace BotNetFun.Bot
             }.Build());
             await JsonHandler.WriteEntry("InBattle", "false", SaveJson);
         }
-
+        // TODO: fix hardcode checks
         [Command("help")]
         [Summary("Get a list of commands")]
         private async Task Help()

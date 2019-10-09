@@ -30,9 +30,9 @@ namespace BotNetFun.Bot
         public DiscordBot()
         {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
-            Configuration = builder.Build();
+            Configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .Build();
         }
 
         public DiscordSocketClient Client { get; set; }
@@ -47,7 +47,7 @@ namespace BotNetFun.Bot
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 2000,
                 ShardId = 1,
-                TotalShards = 1
+                TotalShards = 2
             });
 
             CommandOperation = new CommandService(new CommandServiceConfig
