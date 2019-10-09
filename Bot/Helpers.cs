@@ -47,16 +47,16 @@ namespace BotNetFun.Bot
 
         public T GetRandomFromDictionary<T>(Dictionary<string, T> dict) where T : class
         {
-            List<T> enemyCollectionList = new List<T>();
+            List<T> CollectionList = new List<T>();
             foreach (KeyValuePair<string, T> vals in dict)
             {
-                enemyCollectionList.Add(vals.Value);
+                CollectionList.Add(vals.Value);
             }
 
-            lock (enemyCollectionList)
+            lock (CollectionList)
             {
-                int rand = rnd.Next(enemyCollectionList.Count);
-                return enemyCollectionList[rand] as T;
+                int rand = rnd.Next(CollectionList.Count);
+                return CollectionList[rand] as T;
             }
         }
 
