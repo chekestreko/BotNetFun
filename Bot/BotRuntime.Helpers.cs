@@ -9,8 +9,9 @@ namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
     using BotNetFun.Loot.MetaItem;
-
-    public sealed partial class InternalWorkings : InteractiveBase
+    
+    // Helpers
+    public sealed partial class BotRuntime : InteractiveBase
     {
         private string SaveJson
         {

@@ -18,6 +18,7 @@ namespace BotNetFun.Bot
 			await File.WriteAllTextAsync(savePath, JsonConvert.SerializeObject(savetext, Formatting.Indented));
 		}
 
+        // TODO: fix overloads
         public static async Task<string> GetData(string property, string savePath)
         {
             property = property.RemoveWhitespace();
@@ -26,6 +27,7 @@ namespace BotNetFun.Bot
             return savetext[property];
         }
         
+        // TODO: fix overloads
         public static async Task<double> GetData(string property, string savePath)
         {
             property = property.RemoveWhitespace();
@@ -34,9 +36,7 @@ namespace BotNetFun.Bot
             return double.Parse(savetext[property]);
         }
 
-        #region WriteEntryNumberOverload
         public static async Task WriteEntry(string property, double val, string savePath)
 			=> await WriteEntry(property, val.ToString(), savePath);
-		#endregion
 	}
 }

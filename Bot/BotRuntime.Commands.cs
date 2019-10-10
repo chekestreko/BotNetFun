@@ -17,7 +17,9 @@ namespace BotNetFun.Bot
     using BotNetFun.Enemy;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as a method via attribute")]
-    public sealed partial class InternalWorkings : InteractiveBase
+    
+    // Commands
+    public sealed partial class BotRuntime : InteractiveBase
     {
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("forceexit")]
