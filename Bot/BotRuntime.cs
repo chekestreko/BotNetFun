@@ -10,27 +10,27 @@ namespace BotNetFun.Bot
     using BotNetFun.Data;
     using BotNetFun.Loot.MetaItem;
     
-    // Helpers
-    public sealed partial class BotRuntime : InteractiveBase
+    // Base bot runtime class
+    internal abstract class BotRuntime : InteractiveBase
     {
-        private string SaveJson
+        protected string SaveJson
         {
             get => $"{Constants.SavePath + "/" + Context.User.Id}.json";
         }
 
-        private async Task<double> XPToLevelUp()
+        protected async Task<double> XPToLevelUp()
         {
             double PlayerLevel = double.Parse(await JsonHandler.GetData("XP", SaveJson));
             return (PlayerLevel * 12.7) + (PlayerLevel * PlayerLevel);
         }
 
-        private async Task<bool> HasInitialized()
+        protected async Task<bool> HasInitialized()
         {
             string file = await File.ReadAllTextAsync(SaveJson);
             return file.Contains("Class");
         }
 
-        private async Task StarterSavefileIntegrity()
+        protected async Task StarterSavefileIntegrity()
         {
             if (!File.Exists(SaveJson))
             {
@@ -39,14 +39,14 @@ namespace BotNetFun.Bot
             }
         }
 
-        private async Task PlayerUpdate()
+        protected async Task PlayerUpdate()
         {
             long MaxHealthCheck = long.Parse(await JsonHandler.GetData("MaxHealth", SaveJson));
             if (long.Parse(await JsonHandler.GetData("Health", SaveJson)) > MaxHealthCheck)
                 await JsonHandler.WriteEntry("Health", MaxHealthCheck, SaveJson);
         }
 
-        public T GetRandomFromDictionary<T>(Dictionary<string, T> dict) where T : class
+        protected T GetRandomFromDictionary<T>(Dictionary<string, T> dict) where T : class
         {
             List<T> CollectionList = new List<T>();
             foreach (KeyValuePair<string, T> vals in dict)
@@ -61,12 +61,12 @@ namespace BotNetFun.Bot
             }
         }
 
-        private string GetItemInfo(Item item)
+        protected string GetItemInfo(Item item)
         {
             string retVal = $@"Item type: {Collections.ParseItemInfo(item) + Constants.NL}";
             return retVal;
         }
 
-        private readonly Random rnd = new Random();
+        protected readonly Random rnd = new Random();
     }
 }

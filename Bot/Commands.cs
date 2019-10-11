@@ -13,13 +13,14 @@ using SnowynxHelpers.Extensions;
 
 namespace BotNetFun.Bot
 {
+    using BotNetFun.Bot;
     using BotNetFun.Data;
     using BotNetFun.Enemy;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as a method via attribute")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as a method via attribute")]
     
     // Commands
-    public sealed partial class BotRuntime : InteractiveBase
+    public sealed class Commands : BotRuntime
     {
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("forceexit")]
