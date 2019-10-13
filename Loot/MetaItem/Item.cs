@@ -11,24 +11,27 @@ namespace BotNetFun.Loot.MetaItem
         public ItemContextInfo Info { get; private set; }
         public Rarity Rarity { get; private set; }
         public ItemType Type { get; private set; }
-        public ItemExtraStat Bonus { get; private set; }
+        public ItemBonus Bonus { get; private set; }
+        public ItemExtraStat ExtraStat { get; private set; }
         public ItemSet Set { get; private set; }
         public Item(
             string _name,
             ItemContextInfo info,
             Rarity rare = Rarity.Common,
             ItemType ty = ItemType.Primary,
-            ItemExtraStat _bo = null,
+            ItemBonus bo = null,
+            ItemExtraStat _st = null,
             ItemSet _set = null
         )
         {
             Name = _name;
             Info = info;
             Rarity = rare;
-            if (_bo is null) _bo = new ItemExtraStat(ItemBonusType.NoItemBonus);
+            if (_st is null) _st = new ItemExtraStat(ItemBonusType.NoItemBonus);
             if (_set is null) _set = null;
+            Bonus = bo;
             Type = ty;
-            Bonus = _bo;
+            ExtraStat = _st;
             Set = _set;
         }
 
@@ -37,9 +40,10 @@ namespace BotNetFun.Loot.MetaItem
             ItemContextInfo info,
             Rarity rare = Rarity.Common,
             ItemType ty = ItemType.Primary,
-            ItemExtraStat _bo = null,
+            ItemBonus bo = null,
+            ItemExtraStat _st = null,
             ItemSet _set = null
-        ) => new Item(_name, info, rare, ty, _bo, _set);
+        ) => new Item(_name, info, rare, ty, bo, _st, _set);
 
         public static ItemData GetItemData (Item item, int playerLevel)
         {
@@ -90,7 +94,6 @@ namespace BotNetFun.Loot.MetaItem
             switch (item.Info)
             {
                 case ItemContextInfo.BasicArmor:
-                    returnValue
                     break;
                 case ItemContextInfo.BasicWeapon:
                     break;

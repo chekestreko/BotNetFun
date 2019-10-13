@@ -2,43 +2,16 @@
 {
     using BotNetFun.Loot.Enums;
 
-    public sealed class ItemExtraStat
+    public sealed class ItemBonus
     {
-        public ItemBonusType BonusAffect { get; private set; }
-        public ItemBonusType ExtraBonusAffect { get; private set; } = ItemBonusType.NoItemBonus;
-        public int BonusContent { get; private set; }
-        public int ExtraBonusContent { get; private set; } = 0;
-        public bool MultiBonus { get; } = false;
-
-        public ItemExtraStat(ItemBonusType bonus, int content = 0, ItemBonusType extraBonus = ItemBonusType.NoItemBonus, int extraContent = 0)
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public ItemBonusContext Context { get; private set; }
+        public ItemBonus(string name, string description, ItemBonusContext cont)
         {
-            BonusAffect = bonus;
-            if (bonus == ItemBonusType.NoItemBonus) return;
-            if (bonus != ItemBonusType.NoItemBonus && content != 0)
-                throw new System.InvalidOperationException("Item bonus is specified but content isn't specified");
-
-            BonusContent = content;
-            if (extraBonus != ItemBonusType.NoItemBonus && extraBonus != bonus && extraContent != 0)
-            {
-                ExtraBonusAffect = extraBonus;
-                ExtraBonusContent = extraContent;
-                MultiBonus = true;
-            }
+            Name = name;
+            Description = description;
+            Context = cont;
         }
-
-        public static ItemExtraStat HealthBonus(int health)
-            => new ItemExtraStat(ItemBonusType.MaxHealthBonus, health);
-
-        public static ItemExtraStat DodgeBonus(int dodgeChance)
-            => new ItemExtraStat(ItemBonusType.DodgeChanceBonus, dodgeChance);
-
-        /// <summary>
-        /// NOTE: first parameter is health
-        /// </summary>
-        public static ItemExtraStat BothBonuses(int health, int dodgeChance)
-            => new ItemExtraStat(ItemBonusType.MaxHealthBonus, health, ItemBonusType.DodgeChanceBonus, dodgeChance);
-
-        public static ItemExtraStat NoBonus()
-            => new ItemExtraStat(ItemBonusType.NoItemBonus);
     }
 }

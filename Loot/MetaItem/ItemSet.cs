@@ -7,8 +7,8 @@
         public string Name { get; private set; }
         public byte SetId { get; private set; }
         public string Description { get; private set; }
-        public ItemSetContext Context { get; private set; }
-        public ItemSet(string name, byte setid, string description, ItemSetContext cont)
+        public ItemBonusContext Context { get; private set; }
+        public ItemSet(string name, byte setid, string description, ItemBonusContext cont)
         {
             Name = name;
             SetId = setid;

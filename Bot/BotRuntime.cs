@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+using Discord.Commands;
 using Discord.Addons.Interactive;
 
 namespace BotNetFun.Bot
@@ -11,7 +12,7 @@ namespace BotNetFun.Bot
     using BotNetFun.Loot.MetaItem;
 
     // Base bot runtime class
-    public abstract class BotRuntime : InteractiveBase
+    public abstract class BotRuntime : InteractiveBase<ShardedCommandContext>
     {
         protected bool HasProvokedRecently { get; set; }
 

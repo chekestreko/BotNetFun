@@ -70,7 +70,7 @@ namespace BotNetFun.Bot
             };
 
             await RegisterCommandsAsync();
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaE49A.gOHKMSKcJXZvUWJn4Z6vPZFC6CY");
+            await Client.LoginAsync(TokenType.Bot, @"");
             await Client.StartAsync();
             await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
             await Task.Delay(-1);
