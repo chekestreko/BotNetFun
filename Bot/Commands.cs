@@ -364,9 +364,9 @@ namespace BotNetFun.Bot
             
             encounterMessage.EditEmbed("Enemy found!", "Get ready!", Color.DarkRed);
 
-            await Task.Delay(rnd.Next(350, 850));
+            await Task.Delay(Globals.Rnd.Next(350, 850));
             await message.ModifyAsync(msg => msg.Embed = encounterMessage.Build());
-            await Task.Delay(300);
+            await Task.Delay(Globals.Rnd.Next(350, 450));
             await JsonHandler.WriteEntry("InBattle", "false");
         }
 

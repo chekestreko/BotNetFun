@@ -12,6 +12,8 @@
         public const double BossEnemyScale = 2.76751868842;
         public const double ClassEfficiencyPercentBonus = 0.2244;
 
+        public static System.Random Rnd { get; } = new System.Random();
+
         public static void EditEmbed(this Discord.EmbedBuilder builder, string title, string description, Discord.Color color)
         {
             builder.Title = title;

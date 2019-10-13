@@ -6,7 +6,7 @@
         public int Defense { get; set; } 
         public int CritChance { get; set; } 
         public int CritDamage { get; set; } 
-        public int ItemValue { get; set; }
+        public double ItemValue { get; set; }
 
         public void Default()
         {

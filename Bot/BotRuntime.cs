@@ -61,7 +61,7 @@ namespace BotNetFun.Bot
             
             lock (CollectionList)
             {
-                int rand = rnd.Next(0, CollectionList.Count);
+                int rand = Globals.Rnd.Next(0, CollectionList.Count);
                 return CollectionList[rand] as T;
             }
         }
@@ -74,6 +74,6 @@ namespace BotNetFun.Bot
             return retVal;
         }
 
-        protected readonly Random rnd = new Random();
+        //protected readonly Random rnd = new Random();
     }
 }
