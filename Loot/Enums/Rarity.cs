@@ -1,6 +1,6 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
-    internal enum Rarity : byte
+    public enum Rarity : byte
     {
         Trash = 0,
         Common = 1,

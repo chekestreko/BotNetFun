@@ -1,6 +1,6 @@
-﻿namespace BotNetFun.Enemy
+﻿namespace BotNetFun.MetaEnemy
 {
-    internal enum EnemyType : byte
+    public enum EnemyType : byte
     {
         Normal = 0,
         Elite = 1,

@@ -1,6 +1,6 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
-    internal enum ItemType : byte
+    public enum ItemType : byte
     {
         Helmet = 0,
         Chestplate = 1,

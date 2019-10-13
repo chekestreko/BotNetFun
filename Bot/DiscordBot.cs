@@ -15,15 +15,15 @@ namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
 
-    internal sealed class DiscordBot
+    public sealed class DiscordBot
     {
         public static DiscordBot Bot { get; } = new DiscordBot();
 
         [MTAThread]
         private static async Task Main()
         {
-            if (!Directory.Exists(Constants.SavePath))
-                Directory.CreateDirectory(Constants.SavePath);
+            if (!Directory.Exists(Globals.SavePath))
+                Directory.CreateDirectory(Globals.SavePath);
             await Bot.RunBotClient();
         }
         
@@ -70,7 +70,7 @@ namespace BotNetFun.Bot
             };
 
             await RegisterCommandsAsync();
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XZpInw.h9eVSQaTyXoY8hXfqugNcsbNLes");
+            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaE49A.gOHKMSKcJXZvUWJn4Z6vPZFC6CY");
             await Client.StartAsync();
             await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
             await Task.Delay(-1);
@@ -89,6 +89,9 @@ namespace BotNetFun.Bot
                     IResult result = await CommandOperation.ExecuteAsync(context, argumentPos, Services);
                     if (!result.IsSuccess)
                     {
+                        if (result.Error == CommandError.UnknownCommand)
+                            return;
+                        
                         Console.WriteLine(result.ErrorReason);
                         await message.Channel.SendMessageAsync(result.ErrorReason);
                     }

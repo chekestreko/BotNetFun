@@ -36,6 +36,5 @@
     <Folder Include="Bot\" />
     <Folder Include="Data\" />
     <Folder Include="Loot\Enums\" />
-    <Folder Include="Loot\Item\" />
   </ItemGroup>
 </Project>

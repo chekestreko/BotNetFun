@@ -1,15 +1,19 @@
 ﻿namespace BotNetFun.Loot.MetaItem
 {
-    // TODO: literally everything
-    internal sealed class ItemSet
+    using BotNetFun.Loot.Enums;
+
+    public sealed class ItemSet
     {
         public string Name { get; private set; }
-        public int SetId { get; private set; }
+        public byte SetId { get; private set; }
         public string Description { get; private set; }
-        public ItemSet(string name, int setid)
+        public ItemSetContext Context { get; private set; }
+        public ItemSet(string name, byte setid, string description, ItemSetContext cont)
         {
             Name = name;
             SetId = setid;
+            Description = description;
+            Context = cont;
         }
     }
 }
