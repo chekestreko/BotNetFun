@@ -7,14 +7,14 @@
         NormalPlus = 1,
         NormalPlusPlus = 2,
         LiterallyHarmless = 9,
-        #endregion NormalContextInfo - Dual
+        #endregion 
 
         #region TankyContextInfo - Health
         Tough = 10,
         Strong = 11,
         Resilient = 12,
         Turtle = 13,
-        #endregion TankyContextInfo - Health
+        #endregion
 
         #region HurtfulContextInfo - Damage
         Unkind = 20,
@@ -28,13 +28,13 @@
         HealthBig = 31,
         DamageBig = 32,
         RaidDualBig = 33,
-        #endregion BigContextInfo - EliteOrBoss
+        #endregion
 
         #region EndgameContextInfo
         Legendary = 40,
         Godlike = 50,
         Impossible = 255
-        #endregion EndgameContextInfo
+        #endregion 
 
     }
 }

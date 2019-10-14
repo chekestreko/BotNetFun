@@ -1,5 +1,6 @@
 ﻿namespace BotNetFun.Loot.MetaItem
 {
+    [System.Serializable]
     public class ItemData
     {
         public int Damage { get; set; } 

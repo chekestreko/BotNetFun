@@ -2,6 +2,7 @@
 {
     using BotNetFun.Loot.Enums;
 
+    [System.Serializable]
     public sealed class ItemExtraStat
     {
         public ItemBonusType BonusAffect { get; private set; }

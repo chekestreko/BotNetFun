@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+using Discord.Commands;
 using Discord.Addons.Interactive;
 
 namespace BotNetFun.Bot
@@ -11,7 +11,7 @@ namespace BotNetFun.Bot
     using BotNetFun.Loot.MetaItem;
 
     // Base bot runtime class
-    public abstract class BotRuntime : InteractiveBase
+    public abstract class BotRuntime : InteractiveBase<ShardedCommandContext>
     {
         protected bool HasProvokedRecently { get; set; }
 
@@ -24,8 +24,8 @@ namespace BotNetFun.Bot
         protected async Task<double> XPToLevelUp()
         {
             JsonHandler.Path = SaveJson;
-            double PlayerLevel = await JsonHandler.GetData<double>("XP");
-            return (PlayerLevel * PlayerLevel) + (PlayerLevel * 36.591);
+            double PlayerLevel = await JsonHandler.GetData<int>("Level");
+            return (PlayerLevel * PlayerLevel) + (PlayerLevel > 25 ? (PlayerLevel * 36.591) : (PlayerLevel * 18.2955));
         }
 
         protected async Task<bool> HasInitialized()
@@ -56,7 +56,7 @@ namespace BotNetFun.Bot
             if (await JsonHandler.GetData<double>("Health") > MaxHealthCheck)
                 await JsonHandler.WriteEntry("Health", MaxHealthCheck);
         }
-
+        /* <---- might be deprecated ---->
         protected T GetRandomFromDictionary<T>(Dictionary<string, T> dict) where T : class
         {
             JsonHandler.Path = SaveJson;
@@ -71,7 +71,7 @@ namespace BotNetFun.Bot
                 return CollectionList[rand] as T;
             }
         }
-
+        */
         // todo: fix
         protected string GetItemInfo(Item item)
         {

@@ -2,6 +2,7 @@
 {
     using BotNetFun.Loot.Enums;
 
+    [System.Serializable]
     public sealed class ItemSet
     {
         public string Name { get; private set; }
