@@ -29,13 +29,6 @@ namespace BotNetFun.Bot
             Environment.Exit(0);
         }
 
-        [RequireUserPermission(GuildPermission.Administrator)]
-        [Command("injectdependency")]
-        private async Task EjectDependency(string dep)
-        {
-            await ReplyAsync($"Dependency injected! (eject code: 0){Globals.NL}Dependency hashcode: {dep.GetHashCode()}");
-        }
-
         [Command("start")]
         [Alias("initialize", "init")]
         [Summary("Start your adventure! (and with a starting class!)")]
