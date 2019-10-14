@@ -9,19 +9,16 @@ namespace BotNetFun.MetaEnemy
         public string Name { get; private set; }
         public EnemyContextInfo Info { get; private set; }
         public EnemyType EnemyType { get; private set; }
-        public List<Item> LootDropPool { get; private set; }
 
         public Enemy (
             string _name,
             EnemyContextInfo _info,
-            EnemyType et,
-            List<Item> dp
+            EnemyType et = EnemyType.Normal
         )
         {
             Name = _name;
             Info = _info;
             EnemyType = et;
-            LootDropPool = dp;
         }
     }
 }

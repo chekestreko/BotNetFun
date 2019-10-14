@@ -3,18 +3,17 @@
     [System.Serializable]
     public enum Rarity : byte
     {
-        Trash = 0,
-        Common = 1,
-        Uncommon = 2,
-        Refined = 3,
-        Rare = 4,
-        Epic = 5,
-        Legendary = 6,
-        Fabled = 7,
-        Mythical = 8,
-        Extraordinary = 9,
+        None = 0,
+        Trash = 1,
+        Common = 2,
+        Uncommon = 3,
+        Refined = 4,
+        Rare = 5,
+        Epic = 6,
+        Legendary = 7,
+        Fabled = 8,
+        Mythical = 9,
+        Extraordinary = 10,
         Developer = 255,
-
-        None = 254
     }
 }

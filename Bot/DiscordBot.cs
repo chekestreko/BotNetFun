@@ -37,7 +37,7 @@ namespace BotNetFun.Bot
 
         public DiscordSocketClient Client { get; set; }
         public CommandService CommandOperation { get; set; }
-        public IServiceProvider Services { get; set; }
+        public ServiceProvider Services { get; set; }
         public IConfigurationRoot Configuration { get; }
 
         public async Task RunBotClient()
@@ -47,7 +47,7 @@ namespace BotNetFun.Bot
                 LogLevel = LogSeverity.Verbose,
                 MessageCacheSize = 2000,
                 ShardId = 1,
-                TotalShards = 2
+                TotalShards = 5
             });
 
             CommandOperation = new CommandService(new CommandServiceConfig
@@ -59,8 +59,10 @@ namespace BotNetFun.Bot
             Services = new ServiceCollection()
                 .AddSingleton(Client)
                 .AddSingleton(CommandOperation)
+                .AddSingleton(Services)
                 .AddSingleton(Configuration)
                 .AddSingleton<InteractiveService>()
+                .AddSingleton<Random>()
                 .BuildServiceProvider();
 
             Client.Log += arg =>
@@ -70,10 +72,10 @@ namespace BotNetFun.Bot
             };
 
             await RegisterCommandsAsync();
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaPsEw.GHBpyJYCSgWo4dYZbt4qTHB41KE");
+            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaScOA.Z71VE5rmOY_rhmKsju5P7oM6yNY");
             await Client.StartAsync();
             await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
-            await Task.Delay(-1);
+            await Task.Delay(System.Threading.Timeout.Infinite);
                     
         }
 

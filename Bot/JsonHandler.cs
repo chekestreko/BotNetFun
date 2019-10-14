@@ -13,10 +13,11 @@ namespace BotNetFun.Bot
 
     public static class JsonHandler
 	{
-		public static async Task WriteEntry(string property, string val)
+		public static async Task WriteEntry(string property, object val)
 		{
             string dataSaved = await File.ReadAllTextAsync(Path);
 			Dictionary<string, object> savetext = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataSaved);
+            if (val is int) val = (int)val;
             savetext[property] = val;
 			await File.WriteAllTextAsync(Path, JsonConvert.SerializeObject(savetext, Formatting.Indented));
 		}

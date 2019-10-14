@@ -30,10 +30,10 @@ namespace BotNetFun.Bot
         }
 
         [RequireUserPermission(GuildPermission.Administrator)]
-        [Command("ejectdependency")]
+        [Command("injectdependency")]
         private async Task EjectDependency(string dep)
         {
-            await ReplyAsync($"Dependency ejected! (eject code: 0){Globals.NL}Dependency hashcode: {dep.GetHashCode()}");
+            await ReplyAsync($"Dependency injected! (eject code: 0){Globals.NL}Dependency hashcode: {dep.GetHashCode()}");
         }
 
         [Command("start")]
@@ -42,7 +42,6 @@ namespace BotNetFun.Bot
         private async Task Start()
         {
             await StarterSavefileIntegrity();
-            await ReplyAsync("test");
             JsonHandler.Path = SaveJson;
             JsonHandler.ItemPath = SaveItemJson;
             if (await HasInitialized())
@@ -95,7 +94,7 @@ namespace BotNetFun.Bot
                 return;
             }
             string starterclassstr = classQuestion.Content.RemoveWhitespace().ToLower();
-            Item emptyItem = Item.GetEmptyItem();
+            Item emptyItem = Item.GetEmptyItem;
             await JsonHandler.WriteItemEntry("Helmet", emptyItem);
             await JsonHandler.WriteItemEntry("Chestplate", emptyItem);
             await JsonHandler.WriteItemEntry("Gauntlet", emptyItem);
@@ -125,7 +124,7 @@ namespace BotNetFun.Bot
             await JsonHandler.WriteItemEntry("I19", emptyItem);
             await JsonHandler.WriteItemEntry("I20", emptyItem);
 
-            await JsonHandler.WriteEntry("InBattle", "false");
+            await JsonHandler.WriteEntry("InBattle", false);
             await JsonHandler.WriteEntry("Gold", 5);
             await JsonHandler.WriteEntry("Level", 1);
             await JsonHandler.WriteEntry("XP", 0);
@@ -276,7 +275,6 @@ namespace BotNetFun.Bot
                 await ReplyAsync($"Error: specified user ({toGiveTo.Username}) has not initialized yet");
             }
             string fileValidity = await File.ReadAllTextAsync(toGiveToPath);
-            await ReplyAsync("breakpoint");
             if (!fileValidity.Contains("Class"))
             {
                 await ReplyAsync($"Error: specified user ({toGiveTo.Username}) has not initialized yet");
@@ -285,41 +283,38 @@ namespace BotNetFun.Bot
             {
                 await ReplyAsync($"Error: you don't have enough gold ({currentGold}), compared to the amount you want to give ({goldToGive})");
                 return;
-            } else if (toGiveTo is null)
+            } else if (toGiveTo == null)
             {
                 await ReplyAsync($"Error: specified user doesn't seem to exist");
                 return;
             }
-
+            await ReplyAsync($"Giving {goldToGive} gold to {toGiveTo.Username}, please say `confirm` to confirm.");
             SocketMessage confirm;
-            do
+            confirm = await NextMessageAsync(timeout: new TimeSpan(0, 0, 20));
+            if (confirm.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
             {
-                confirm = await NextMessageAsync(timeout: new TimeSpan(0, 0, 20));
-                if (confirm.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
-                {
-                    await JsonHandler.WriteEntry("Gold", currentGold - goldToGive);
-                    JsonHandler.Path = toGiveToPath;
-                    await JsonHandler.WriteEntry("Gold", await JsonHandler.GetData<double>("Gold") + goldToGive);
-                    JsonHandler.Path = SaveJson;
-                    await ReplyAsync($"Successfully gave {goldToGive} gold to {toGiveTo.Username}!");
-                    return; 
-                }
-                else if (confirm.Content.RemoveWhitespace().StartsWith('.'))
-                {
-                    await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.givegold`, input context: giving gold)");
-                    return;
-                }
-                else if (confirm == null)
-                {
-                    await ReplyAsync("You didn't reply in time, please try again. (`.givegold`)");
-                    return;
-                }
-                else
-                {
-                    await ReplyAsync("Input doesn't match `confirm`, gold giving canceled (use the `.givegold` command again to try again)");
-                    return;
-                }
-            } while (true);
+                await JsonHandler.WriteEntry("Gold", currentGold - goldToGive);
+                JsonHandler.Path = toGiveToPath;
+                await JsonHandler.WriteEntry("Gold", await JsonHandler.GetData<double>("Gold") + goldToGive);
+                JsonHandler.Path = SaveJson;
+                await ReplyAsync($"Successfully gave {goldToGive} gold to {toGiveTo.Username}!");
+                return;
+            }
+            else if (confirm.Content.RemoveWhitespace().StartsWith('.'))
+            {
+                await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.givegold`, input context: giving gold)");
+                return;
+            }
+            else if (confirm == null)
+            {
+                await ReplyAsync("You didn't reply in time, please try again. (`.givegold`)");
+                return;
+            }
+            else
+            {
+                await ReplyAsync("Input doesn't match `confirm`, gold giving canceled (use the `.givegold` command again to try again if that was a mistake)");
+                return;
+            }
         }
 
         // TODO: actual encounter
@@ -380,5 +375,6 @@ namespace BotNetFun.Bot
 
             await ReplyAsync("List of commands: ", embed: embedBuilder.Build());
         }
+
     }
 }

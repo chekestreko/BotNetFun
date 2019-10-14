@@ -15,49 +15,36 @@ namespace BotNetFun.Loot.MetaItem
         public ItemExtraStat ExtraStat { get; private set; }
         public ItemSet Set { get; private set; }
         public ItemEfficientClass EfficientClass { get; private set; }
-        public bool EmptyItem { get; }
+        public ItemData Data { get; private set; }
 
-        public Item (
+        public Item(
             string _name,
-            ItemContextInfo info,
-            Rarity rare = Rarity.Common,
-            ItemType ty = ItemType.Primary,
+            int playerLevel,
+            ItemContextInfo info = ItemContextInfo.None,
+            Rarity rare = Rarity.None,
+            ItemType ty = ItemType.None,
             ItemBonus bo = null,
             ItemExtraStat _st = null,
             ItemSet _set = null,
             ItemEfficientClass ec = ItemEfficientClass.None,
-            bool emptyItem = false
+            ItemData data = null
         )
         {
-            Name = _name;
+            Name = _name ?? "None";
             Info = info;
             Rarity = rare;
             Type = ty;
-            if (bo is null) bo = ItemBonus.NoBonus;
-            if (_st is null) _st = ItemExtraStat.NoExtraStat;
-            if (_set is null) _set = ItemSet.NoItemSet;
-            Bonus = bo;
-            ExtraStat = _st;
-            Set = _set;
+            if (bo is null) Bonus = ItemBonus.NoBonus;
+            if (_st is null) ExtraStat = ItemExtraStat.NoExtraStat;
+            if (_set is null) Set = ItemSet.NoItemSet;
             EfficientClass = ec;
-            EmptyItem = emptyItem;
+            if (data is null) Data = GetItemData(this, playerLevel);
         }
 
-        public static Item CreateItem (
-            string _name,
-            ItemContextInfo info,
-            Rarity rare = Rarity.Common,
-            ItemType ty = ItemType.Primary,
-            ItemBonus bo = null,
-            ItemExtraStat _st = null,
-            ItemSet _set = null,
-            ItemEfficientClass ec = ItemEfficientClass.None
-        ) => new Item(_name, info, rare, ty, bo, _st, _set, ec);
+        public static Item GetEmptyItem
+            => new Item("None", 0, ItemContextInfo.None, Rarity.None, ItemType.None);
 
-        public static Item GetEmptyItem()
-            => new Item("None", ItemContextInfo.None, Rarity.None, ItemType.None, emptyItem: true);
-
-        public static ItemData GetItemData(Item item, int playerLevel)
+        private ItemData GetItemData(Item item, int playerLevel)
         {
             ItemData returnValue = new ItemData();
             double rarityMultiplier = 0;

@@ -7,7 +7,7 @@
 
   <Target Name="BeforeBuild">
     <ItemGroup>
-      <CustomConfigFile Include="$(OutputPath)\SaveData" />
+      <CustomConfigFile Include="$(OutputPath)SaveData\**" />
     </ItemGroup>
     <ItemGroup>
       <FileWrites Include="@(CustomConfigFile)" />
@@ -31,7 +31,7 @@
     <PackageReference Include="Discord.Addons.Interactive" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Enemy\" />
+    <Folder Include="MetaEnemy\" />
     <Folder Include="Loot\" />
     <Folder Include="Bot\" />
     <Folder Include="Data\" />

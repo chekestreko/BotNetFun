@@ -1,6 +1,6 @@
 ﻿namespace BotNetFun.Loot.MetaItem
 {
-    public struct ItemData
+    public class ItemData
     {
         public int Damage { get; set; } 
         public int Defense { get; set; } 
