@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-using Discord.Commands;
 using Discord.Addons.Interactive;
 
 namespace BotNetFun.Bot
@@ -12,18 +11,21 @@ namespace BotNetFun.Bot
     using BotNetFun.Loot.MetaItem;
 
     // Base bot runtime class
-    public abstract class BotRuntime : InteractiveBase<ShardedCommandContext>
+    public abstract class BotRuntime : InteractiveBase
     {
         protected bool HasProvokedRecently { get; set; }
 
         protected string SaveJson
-            => $"{Globals.SavePath + "/" + Context.User.Id}.json";
+            => $"{Globals.SavePath}/{Context.User.Id}.json";
+
+        protected string SaveItemJson
+            => $"{Globals.SavePath}/{Context.User.Id}.Items.json";
 
         protected async Task<double> XPToLevelUp()
         {
             JsonHandler.Path = SaveJson;
             double PlayerLevel = await JsonHandler.GetData<double>("XP");
-            return (PlayerLevel * PlayerLevel) + (PlayerLevel * 36.591); 
+            return (PlayerLevel * PlayerLevel) + (PlayerLevel * 36.591);
         }
 
         protected async Task<bool> HasInitialized()
@@ -35,11 +37,15 @@ namespace BotNetFun.Bot
 
         protected async Task StarterSavefileIntegrity()
         {
-            JsonHandler.Path = SaveJson;
             if (!File.Exists(SaveJson))
             {
                 File.CreateText(SaveJson);
                 await File.WriteAllTextAsync(SaveJson, "{}");
+            }
+            if (!File.Exists(SaveItemJson))
+            {
+                File.CreateText(SaveItemJson);
+                await File.WriteAllTextAsync(SaveItemJson, "{}");
             }
         }
 
@@ -61,7 +67,7 @@ namespace BotNetFun.Bot
             
             lock (CollectionList)
             {
-                int rand = Globals.Rnd.Next(0, CollectionList.Count);
+                int rand = Globals.Rnd.Next(0, CollectionList.Count + 1);
                 return CollectionList[rand] as T;
             }
         }
@@ -73,7 +79,5 @@ namespace BotNetFun.Bot
             string retVal = $@"Item type: {Collections.ParseItemInfo(item) + Globals.NL}";
             return retVal;
         }
-
-        //protected readonly Random rnd = new Random();
     }
 }

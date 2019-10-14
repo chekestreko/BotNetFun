@@ -38,7 +38,7 @@
         public static ItemExtraStat BothBonuses(int health, int dodgeChance)
             => new ItemExtraStat(ItemBonusType.MaxHealthBonus, health, ItemBonusType.DodgeChanceBonus, dodgeChance);
 
-        public static ItemExtraStat NoBonus()
+        public static ItemExtraStat NoExtraStat
             => new ItemExtraStat(ItemBonusType.NoItemBonus);
     }
 }

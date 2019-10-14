@@ -1,5 +1,6 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
+    [System.Serializable]
     public enum Rarity : byte
     {
         Trash = 0,
@@ -12,6 +13,8 @@
         Fabled = 7,
         Mythical = 8,
         Extraordinary = 9,
-        Developer = 255
+        Developer = 255,
+
+        None = 254
     }
 }

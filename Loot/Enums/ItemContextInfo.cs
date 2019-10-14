@@ -1,10 +1,13 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
+    [System.Serializable]
     public enum ItemContextInfo : byte
     {
+        None = 0,
+
         #region Basic
-        BasicArmor = 0,
-        BasicWeapon = 1,
+        BasicArmor = 1,
+        BasicWeapon = 2,
         BasicCharm = 3,
         #endregion Basic
 
@@ -33,7 +36,7 @@
         HighTierRare = 43,
         EndgameRare = 44,
         SetEndgameRare = 45,
-        Developer = 255
+        Developer = 255,
         #endregion
     }
 }

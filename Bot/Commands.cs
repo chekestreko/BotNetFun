@@ -13,6 +13,7 @@ using SnowynxHelpers.Extensions;
 namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
+    using BotNetFun.Loot.MetaItem;
     using BotNetFun.MetaEnemy;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as an async method via Command attribute")]
@@ -28,13 +29,22 @@ namespace BotNetFun.Bot
             Environment.Exit(0);
         }
 
+        [RequireUserPermission(GuildPermission.Administrator)]
+        [Command("ejectdependency")]
+        private async Task EjectDependency(string dep)
+        {
+            await ReplyAsync($"Dependency ejected! (eject code: 0){Globals.NL}Dependency hashcode: {dep.GetHashCode()}");
+        }
+
         [Command("start")]
         [Alias("initialize", "init")]
         [Summary("Start your adventure! (and with a starting class!)")]
         private async Task Start()
         {
-            JsonHandler.Path = SaveJson;
             await StarterSavefileIntegrity();
+            await ReplyAsync("test");
+            JsonHandler.Path = SaveJson;
+            JsonHandler.ItemPath = SaveItemJson;
             if (await HasInitialized())
             {
                 await ReplyAsync($"{Context.User.Username}, you already initialized. Use the `.help` command if you need help.");
@@ -47,6 +57,7 @@ namespace BotNetFun.Bot
             }
             EmbedBuilder classEmbedInfo = new EmbedBuilder {
                 Title = "Initalization",
+                Description = "Starting your adventure",
                 Color = Color.Blue
             };
             classEmbedInfo.AddField("Class selection ", $"Hello {Context.User.Username}! Please choose a starter class by responding with any of the following starter class keywords: ");
@@ -57,101 +68,93 @@ namespace BotNetFun.Bot
             classEmbedInfo.AddField("Knight ", "Similar to the `Barbarian`, but mitigates more damage rather than taking it upfront");
             await ReplyAsync(embed: classEmbedInfo.Build());
             TimeSpan timer = new TimeSpan(0, 1, 20);
-            SocketMessage classQuestion;
-            do
+            SocketMessage classQuestion = await NextMessageAsync(timeout: timer);
+            if (classQuestion == null)
             {
-                classQuestion = await NextMessageAsync(timeout: timer);
-                if (classQuestion == null)
-                {
-                    await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
-                    return;
-                }
-                else if (!classQuestion.Content.RemoveWhitespace().Equals("barbarian", StringComparison.OrdinalIgnoreCase) &&
-                  !classQuestion.Content.RemoveWhitespace().Equals("ninja", StringComparison.OrdinalIgnoreCase) &&
-                  !classQuestion.Content.RemoveWhitespace().Equals("rogue", StringComparison.OrdinalIgnoreCase) &&
-                  !classQuestion.Content.RemoveWhitespace().Equals("knight", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (classQuestion.Content.RemoveWhitespace().StartsWith('.'))
-                    {
-                        await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
-                        HasProvokedRecently = true;
-                        return;
-                    }
-                    await ReplyAsync("Unknown class, please try again. (`.start`, remember to check spelling)");
-                    return;
-                }
-                else if (classQuestion.Content.RemoveWhitespace().StartsWith('.'))
+                await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
+                return;
+            }
+            else if (!classQuestion.Content.RemoveWhitespace().Equals("barbarian", StringComparison.OrdinalIgnoreCase) &&
+                !classQuestion.Content.RemoveWhitespace().Equals("ninja", StringComparison.OrdinalIgnoreCase) &&
+                !classQuestion.Content.RemoveWhitespace().Equals("rogue", StringComparison.OrdinalIgnoreCase) &&
+                !classQuestion.Content.RemoveWhitespace().Equals("knight", StringComparison.OrdinalIgnoreCase))
+            {
+                if (classQuestion.Content.RemoveWhitespace().StartsWith('.'))
                 {
                     await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
                     HasProvokedRecently = true;
                     return;
                 }
-                else break;
-            } while (true);
+                await ReplyAsync("Unknown class, please try again. (`.start`, remember to check spelling)");
+                return;
+            }
+            else if (classQuestion.Content.RemoveWhitespace().StartsWith('.'))
+            {
+                await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
+                HasProvokedRecently = true;
+                return;
+            }
             string starterclassstr = classQuestion.Content.RemoveWhitespace().ToLower();
+            Item emptyItem = Item.GetEmptyItem();
+            await JsonHandler.WriteItemEntry("Helmet", emptyItem);
+            await JsonHandler.WriteItemEntry("Chestplate", emptyItem);
+            await JsonHandler.WriteItemEntry("Gauntlet", emptyItem);
+            await JsonHandler.WriteItemEntry("Pants", emptyItem);
+            await JsonHandler.WriteItemEntry("Boots", emptyItem);
+            await JsonHandler.WriteItemEntry("Primary", emptyItem);
+            await JsonHandler.WriteItemEntry("Secondary", emptyItem);
+            await JsonHandler.WriteItemEntry("Charm", emptyItem);
+            await JsonHandler.WriteItemEntry("I1", emptyItem);
+            await JsonHandler.WriteItemEntry("I2", emptyItem);
+            await JsonHandler.WriteItemEntry("I3", emptyItem);
+            await JsonHandler.WriteItemEntry("I4", emptyItem);
+            await JsonHandler.WriteItemEntry("I5", emptyItem);
+            await JsonHandler.WriteItemEntry("I6", emptyItem);
+            await JsonHandler.WriteItemEntry("I7", emptyItem);
+            await JsonHandler.WriteItemEntry("I8", emptyItem);
+            await JsonHandler.WriteItemEntry("I9", emptyItem);
+            await JsonHandler.WriteItemEntry("I10", emptyItem);
+            await JsonHandler.WriteItemEntry("I11", emptyItem);
+            await JsonHandler.WriteItemEntry("I12", emptyItem);
+            await JsonHandler.WriteItemEntry("I13", emptyItem);
+            await JsonHandler.WriteItemEntry("I14", emptyItem);
+            await JsonHandler.WriteItemEntry("I15", emptyItem);
+            await JsonHandler.WriteItemEntry("I16", emptyItem);
+            await JsonHandler.WriteItemEntry("I17", emptyItem);
+            await JsonHandler.WriteItemEntry("I18", emptyItem);
+            await JsonHandler.WriteItemEntry("I19", emptyItem);
+            await JsonHandler.WriteItemEntry("I20", emptyItem);
+
             await JsonHandler.WriteEntry("InBattle", "false");
-            await JsonHandler.WriteEntry("Helmet", string.Empty);
-            await JsonHandler.WriteEntry("Chestplate", string.Empty);
-            await JsonHandler.WriteEntry("Gauntlet", string.Empty);
-            await JsonHandler.WriteEntry("Pants", string.Empty);
-            await JsonHandler.WriteEntry("Boots", string.Empty);
-            await JsonHandler.WriteEntry("Primary", string.Empty);
-            await JsonHandler.WriteEntry("Secondary", string.Empty);
-            await JsonHandler.WriteEntry("Charm", string.Empty);
             await JsonHandler.WriteEntry("Gold", 5);
             await JsonHandler.WriteEntry("Level", 1);
             await JsonHandler.WriteEntry("XP", 0);
-            await JsonHandler.WriteEntry("I1", string.Empty);
-            await JsonHandler.WriteEntry("I2", string.Empty);
-            await JsonHandler.WriteEntry("I3", string.Empty);
-            await JsonHandler.WriteEntry("I4", string.Empty);
-            await JsonHandler.WriteEntry("I5", string.Empty);
-            await JsonHandler.WriteEntry("I6", string.Empty);
-            await JsonHandler.WriteEntry("I7", string.Empty);
-            await JsonHandler.WriteEntry("I8", string.Empty);
-            await JsonHandler.WriteEntry("I9", string.Empty);
-            await JsonHandler.WriteEntry("I10", string.Empty);
-            await JsonHandler.WriteEntry("I11", string.Empty);
-            await JsonHandler.WriteEntry("I12", string.Empty);
-            await JsonHandler.WriteEntry("I13", string.Empty);
-            await JsonHandler.WriteEntry("I14", string.Empty);
-            await JsonHandler.WriteEntry("I15", string.Empty);
-            await JsonHandler.WriteEntry("I16", string.Empty);
-            await JsonHandler.WriteEntry("I17", string.Empty);
-            await JsonHandler.WriteEntry("I18", string.Empty);
-            await JsonHandler.WriteEntry("I19", string.Empty);
-            await JsonHandler.WriteEntry("I20", string.Empty);
             switch (starterclassstr)
             {
                 case "barbarian":
                     await ReplyAsync("You picked the `Barbarian` class! Please say `confirm` to confirm.");
-                    SocketMessage confirm1;
-                    do
+                    SocketMessage confirm1 = await NextMessageAsync(timeout: timer);
+                    if (confirm1.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        confirm1 = await NextMessageAsync(timeout: timer);
-                        if (confirm1.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
-                        {
-                            await JsonHandler.WriteEntry("Class", "Barbarian");
-                            await ReplyAsync($"`Barbarian` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
-                            break;
-                        }
-                        else if (confirm1.Content.RemoveWhitespace().StartsWith('.'))
-                        {
-                            await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
-                            HasProvokedRecently = true;
-                            return;
-                        }
-                        else if (confirm1 == null)
-                        {
-                            await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
-                            return;
-                        }
-                        else
-                        {
-                            await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
-                            return;
-                        }
-                    } while (true);
+                        await JsonHandler.WriteEntry("Class", "Barbarian");
+                        await ReplyAsync($"`Barbarian` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
+                    }
+                    else if (confirm1.Content.RemoveWhitespace().StartsWith('.'))
+                    {
+                        await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
+                        HasProvokedRecently = true;
+                        return;
+                    }
+                    else if (confirm1 == null)
+                    {
+                        await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
+                        return;
+                    }
+                    else
+                    {
+                        await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
+                        return;
+                    }
                     await JsonHandler.WriteEntry("MaxHealth", 20);
                     await JsonHandler.WriteEntry("Health", 20);
                     await JsonHandler.WriteEntry("DodgeChance", 2);
@@ -162,33 +165,28 @@ namespace BotNetFun.Bot
                     break;
                 case "ninja":
                     await ReplyAsync("You picked the `Ninja` class! Please say `confirm` to confirm.");
-                    SocketMessage confirm2;
-                    do
+                    SocketMessage confirm2 = await NextMessageAsync(timeout: timer); 
+                    if (confirm2.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        confirm2 = await NextMessageAsync(timeout: timer); 
-                        if (confirm2.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
-                        {
-                            await JsonHandler.WriteEntry("Class", "Ninja");
-                            await ReplyAsync($"`Ninja` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
-                            break;
-                        }
-                        else if (confirm2.Content.RemoveWhitespace().StartsWith('.'))
-                        {
-                            await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
-                            HasProvokedRecently = true;
-                            return;
-                        }
-                        else if (confirm2 == null)
-                        {
-                            await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
-                            return;
-                        }
-                        else
-                        {
-                            await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
-                            return;
-                        }
-                    } while (true);
+                        await JsonHandler.WriteEntry("Class", "Ninja");
+                        await ReplyAsync($"`Ninja` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
+                    }
+                    else if (confirm2.Content.RemoveWhitespace().StartsWith('.'))
+                    {
+                        await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
+                        HasProvokedRecently = true;
+                        return;
+                    }
+                    else if (confirm2 == null)
+                    {
+                        await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
+                        return;
+                    }
+                    else
+                    {
+                        await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
+                        return;
+                    }
                     await JsonHandler.WriteEntry("MaxHealth", 9);
                     await JsonHandler.WriteEntry("Health", 9);
                     await JsonHandler.WriteEntry("DodgeChance", 6);
@@ -199,33 +197,28 @@ namespace BotNetFun.Bot
                     break;
                 case "rogue":
                     await ReplyAsync("You picked the `Rogue` class! Please say `confirm` to confirm.");
-                    SocketMessage confirm3;
-                    do
+                    SocketMessage confirm3 = await NextMessageAsync(timeout: timer);
+                    if (confirm3.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        confirm3 = await NextMessageAsync(timeout: timer);
-                        if (confirm3.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
-                        {
-                            await JsonHandler.WriteEntry("Class", "Rogue");
-                            await ReplyAsync($"`Rogue` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
-                            break;
-                        }
-                        else if (confirm3.Content.RemoveWhitespace().StartsWith('.'))
-                        {
-                            await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
-                            HasProvokedRecently = true;
-                            return;
-                        }
-                        else if (confirm3 == null)
-                        {
-                            await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
-                            return;
-                        }
-                        else
-                        {
-                            await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
-                            return;
-                        }
-                    } while (true);
+                        await JsonHandler.WriteEntry("Class", "Rogue");
+                        await ReplyAsync($"`Rogue` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
+                    }
+                    else if (confirm3.Content.RemoveWhitespace().StartsWith('.'))
+                    {
+                        await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
+                        HasProvokedRecently = true;
+                        return;
+                    }
+                    else if (confirm3 == null)
+                    {
+                        await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
+                        return;
+                    }
+                    else
+                    {
+                        await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
+                        return;
+                    }
                     await JsonHandler.WriteEntry("MaxHealth", 6);
                     await JsonHandler.WriteEntry("Health", 6);
                     await JsonHandler.WriteEntry("DodgeChance", 8);
@@ -236,33 +229,29 @@ namespace BotNetFun.Bot
                     break;
                 case "knight":
                     await ReplyAsync("You picked the `Knight` class! Please say `confirm` to confirm.");
-                    SocketMessage confirm4;
-                    do
+                    SocketMessage confirm4 = await NextMessageAsync(timeout: timer);
+                    if (confirm4.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        confirm4 = await NextMessageAsync(timeout: timer);
-                        if (confirm4.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
-                        {
-                            await JsonHandler.WriteEntry("Class", "Knight");
-                            await ReplyAsync($"`Knight` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
-                            break;
-                        }
-                        else if (confirm4.Content.RemoveWhitespace().StartsWith('.'))
-                        {
-                            await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
-                            HasProvokedRecently = true;
-                            return;
-                        }
-                        else if (confirm4 == null)
-                        {
-                            await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
-                            return;
-                        }
-                        else 
-                        {
-                            await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
-                            return;
-                        }
-                    } while (true);
+                        await JsonHandler.WriteEntry("Class", "Knight");
+                        await ReplyAsync($"`Knight` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
+                    }
+                    else if (confirm4.Content.RemoveWhitespace().StartsWith('.'))
+                    {
+                        await ReplyAsync("No commands allowed --- you were currently being awaited for input, please try again. (`.start`, input context: choosing class)");
+                        HasProvokedRecently = true;
+                        return;
+                    }
+                    else if (confirm4 == null)
+                    {
+                        await ReplyAsync("You didn't reply in time, please try again. (`.start`)");
+                        return;
+                    }
+                    else
+                    {
+                        await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
+                        return;
+                    }
+
                     await JsonHandler.WriteEntry("MaxHealth", 15);
                     await JsonHandler.WriteEntry("Health", 15);
                     await JsonHandler.WriteEntry("DodgeChance", 4);
@@ -279,6 +268,7 @@ namespace BotNetFun.Bot
         private async Task GiveGold(IUser toGiveTo, double goldToGive)
         {
             JsonHandler.Path = SaveJson;
+            JsonHandler.ItemPath = SaveItemJson;
             double currentGold = await JsonHandler.GetData<double>("Gold");
             string toGiveToPath = $"{AppDomain.CurrentDomain.BaseDirectory}/SaveData/{toGiveTo.Id}.json";
             if (!File.Exists(toGiveToPath))
@@ -339,6 +329,7 @@ namespace BotNetFun.Bot
         private async Task Encounter()
         {
             JsonHandler.Path = SaveJson;
+            JsonHandler.ItemPath = SaveItemJson;
             await StarterSavefileIntegrity();
             if (!File.Exists(SaveJson))
             {
@@ -360,7 +351,7 @@ namespace BotNetFun.Bot
             IUserMessage message = await ReplyAsync(embed: encounterMessage.Build());
 
             //Dictionary<string, Enemy> enemyCollection = Collections.Enemies;
-            //Enemy encounteredEnemy = GetRandomFromDictionary(enemyCollection); 
+            //Enemy encounteredEnemy = GetRandomFromDictionary<Enemy>(enemyCollection); 
             
             encounterMessage.EditEmbed("Enemy found!", "Get ready!", Color.DarkRed);
 

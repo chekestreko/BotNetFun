@@ -15,5 +15,8 @@
             Description = description;
             Context = cont;
         }
+
+        public static ItemSet NoItemSet
+            => new ItemSet("None", 0, "N/A", ItemBonusContext.None);
     }
 }

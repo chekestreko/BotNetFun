@@ -14,26 +14,33 @@ namespace BotNetFun.Loot.MetaItem
         public ItemBonus Bonus { get; private set; }
         public ItemExtraStat ExtraStat { get; private set; }
         public ItemSet Set { get; private set; }
-        public Item(
+        public ItemEfficientClass EfficientClass { get; private set; }
+        public bool EmptyItem { get; }
+
+        public Item (
             string _name,
             ItemContextInfo info,
             Rarity rare = Rarity.Common,
             ItemType ty = ItemType.Primary,
             ItemBonus bo = null,
             ItemExtraStat _st = null,
-            ItemSet _set = null
+            ItemSet _set = null,
+            ItemEfficientClass ec = ItemEfficientClass.None,
+            bool emptyItem = false
         )
         {
             Name = _name;
             Info = info;
             Rarity = rare;
             Type = ty;
-            if (bo is null) { }
-            if (_st is null) _st = new ItemExtraStat(ItemBonusType.NoItemBonus);
-            if (_set is null) _set = null;
+            if (bo is null) bo = ItemBonus.NoBonus;
+            if (_st is null) _st = ItemExtraStat.NoExtraStat;
+            if (_set is null) _set = ItemSet.NoItemSet;
             Bonus = bo;
             ExtraStat = _st;
             Set = _set;
+            EfficientClass = ec;
+            EmptyItem = emptyItem;
         }
 
         public static Item CreateItem (
@@ -43,10 +50,14 @@ namespace BotNetFun.Loot.MetaItem
             ItemType ty = ItemType.Primary,
             ItemBonus bo = null,
             ItemExtraStat _st = null,
-            ItemSet _set = null
-        ) => new Item(_name, info, rare, ty, bo, _st, _set);
+            ItemSet _set = null,
+            ItemEfficientClass ec = ItemEfficientClass.None
+        ) => new Item(_name, info, rare, ty, bo, _st, _set, ec);
 
-        public static ItemData GetItemData (Item item, int playerLevel)
+        public static Item GetEmptyItem()
+            => new Item("None", ItemContextInfo.None, Rarity.None, ItemType.None, emptyItem: true);
+
+        public static ItemData GetItemData(Item item, int playerLevel)
         {
             ItemData returnValue = new ItemData();
             double rarityMultiplier = 0;
@@ -85,25 +96,26 @@ namespace BotNetFun.Loot.MetaItem
                     break;
                 case Rarity.Fabled:
                     rarityMultiplier = 2.44;
-                    returnValue.ItemValue = (playerLevel * 6) + Globals.Rnd.Next(10, 18);
+                    returnValue.ItemValue = (playerLevel * 6) + Globals.Rnd.Next(10, 19);
                     break;
                 case Rarity.Mythical:
                     rarityMultiplier = 3.11;
-                    returnValue.ItemValue = (playerLevel * 7) + Globals.Rnd.Next(15, 25);
+                    returnValue.ItemValue = (playerLevel * 7) + Globals.Rnd.Next(15, 26);
                     break;
                 case Rarity.Extraordinary:
                     rarityMultiplier = 4.22;
-                    returnValue.ItemValue = (playerLevel * 8) + Globals.Rnd.Next(21, 31);
+                    returnValue.ItemValue = (playerLevel * 8) + Globals.Rnd.Next(21, 33);
                     break;
                 case Rarity.Developer:
                     rarityMultiplier = 12.66;
-                    returnValue.ItemValue = (playerLevel * 10) + Globals.Rnd.Next(43, 63);
+                    returnValue.ItemValue = (playerLevel * 10) + Globals.Rnd.Next(43, 65);
                     break;
             }
 
             returnValue.Default();
             returnValue.ItemValue = RoundThenToInt(scaleMulti * rarityMultiplier);
 
+            //lock (item)
             switch (item.Info)
             {
                 case ItemContextInfo.BasicArmor:
@@ -115,6 +127,15 @@ namespace BotNetFun.Loot.MetaItem
                     returnValue.CritDamage = RoundThenToInt((scaleMulti * rarityMultiplier * 4.2));
                     break;
                 case ItemContextInfo.BasicCharm:
+                    double toChoose = Globals.Rnd.NextDouble();
+                    if (toChoose < 0.251)
+                        returnValue.Damage = RoundThenToInt(1.55 + (playerLevel / 4) * scaleMulti * rarityMultiplier);
+                    else if (toChoose > 0.252 && toChoose < 0.501)
+                        returnValue.Defense = RoundThenToInt(0.76 + (playerLevel / 5) * scaleMulti * rarityMultiplier);
+                    else if (toChoose > 0.502 && toChoose < 0.751)
+                        returnValue.CritChance = RoundThenToInt(0.63 + (playerLevel / 6) * scaleMulti * rarityMultiplier);
+                    else if (toChoose > 0.752)
+                        returnValue.CritDamage = RoundThenToInt(1.22 + (playerLevel / 4.5) * scaleMulti * rarityMultiplier);
                     break;
                 case ItemContextInfo.DefensiveArmor:
                     break;
@@ -150,8 +171,9 @@ namespace BotNetFun.Loot.MetaItem
                     break;
             }
             return returnValue;
-
-            static int RoundThenToInt(double value) => Convert.ToInt32(Math.Round(value)); 
         }
+
+        private static int RoundThenToInt(double value)
+            => Convert.ToInt32(Math.Round(value));
     }
 }

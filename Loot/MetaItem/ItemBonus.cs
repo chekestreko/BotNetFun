@@ -13,5 +13,7 @@
             Description = description;
             Context = cont;
         }
+
+        public static ItemBonus NoBonus => new ItemBonus("None", "N/A", ItemBonusContext.None);
     }
 }

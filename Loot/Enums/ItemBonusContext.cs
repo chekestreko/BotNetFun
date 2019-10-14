@@ -1,5 +1,6 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
+    [System.Serializable]
     public enum ItemBonusContext : byte
     {
         None = 0,
