@@ -11,18 +11,39 @@ namespace BotNetFun.Bot
 {
     using BotNetFun.Loot.MetaItem;
 
-    public static class JsonHandler
+    public sealed class JsonHandler : IAsyncDisposable, IDisposable
 	{
-		public static async Task WriteEntry(string property, object val)
+        public JsonHandler(string path = null, string itemPath = null)
+        {
+            Path = path;
+            ItemPath = itemPath;
+        }
+
+        public async Task WriteEntry(string property, string val)
 		{
             string dataSaved = await File.ReadAllTextAsync(Path);
 			Dictionary<string, object> savetext = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataSaved);
-            if (val is int) val = (int)val;
             savetext[property] = val;
 			await File.WriteAllTextAsync(Path, JsonConvert.SerializeObject(savetext, Formatting.Indented));
 		}
 
-        public static async Task WriteItemEntry(string property, Item val)
+        public async Task WriteEntry(string property, double val)
+        {
+            string dataSaved = await File.ReadAllTextAsync(Path);
+            Dictionary<string, object> savetext = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataSaved);
+            savetext[property] = val;
+            await File.WriteAllTextAsync(Path, JsonConvert.SerializeObject(savetext, Formatting.Indented));
+        }
+
+        public async Task WriteEntry(string property, bool val)
+        {
+            string dataSaved = await File.ReadAllTextAsync(Path);
+            Dictionary<string, object> savetext = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataSaved);
+            savetext[property] = val;
+            await File.WriteAllTextAsync(Path, JsonConvert.SerializeObject(savetext, Formatting.Indented));
+        }
+
+        public async Task WriteItemEntry(string property, Item val)
         {
             string dataSaved = await File.ReadAllTextAsync(ItemPath);
             Dictionary<string, Item> savetext = JsonConvert.DeserializeObject<Dictionary<string, Item>>(dataSaved);
@@ -30,13 +51,13 @@ namespace BotNetFun.Bot
             await File.WriteAllTextAsync(ItemPath, JsonConvert.SerializeObject(savetext, Formatting.Indented));
         }
 
-        public static async Task<T> GetData<T>(string property)
+        public async Task<T> GetData<T>(string property)
         {
             property = property.RemoveWhitespace();
             string data = await File.ReadAllTextAsync(Path);
-            Dictionary<string, string> entrydata = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+            Dictionary<string, object> entrydata = JsonConvert.DeserializeObject<Dictionary<string, object>>(data);
             if (typeof(T) == typeof(string))
-                return (T)(object)entrydata[property];
+                return (T)(object)(string)entrydata[property];
             else if (typeof(T) == typeof(double))
                 return (T)(object)Convert.ToDouble(entrydata[property]);
             else if (typeof(T) == typeof(int))
@@ -45,15 +66,17 @@ namespace BotNetFun.Bot
                 return (T)(object)Convert.ToInt64(entrydata[property]);
             else if (typeof(T) == typeof(bool))
             {
-                if (entrydata[property].ToLower() == "false")
-                    return (T)(object)false;
-                else return (T)(object)true;
+                if (entrydata[property] is string)
+                if (entrydata[property].ToString().ToLower() == "true")
+                    return (T)(object)true;
+
+                return (T)(object)(bool)entrydata[property];
             }
             else
                 throw new ArgumentException("Unknown parsing type", nameof(T));
         }
 
-        public static async Task<Item> GetItemData(string slot)
+        public async Task<Item> GetItemData(string slot)
         {
             slot = slot.RemoveWhitespace();
             string data = await File.ReadAllTextAsync(ItemPath);
@@ -65,10 +88,39 @@ namespace BotNetFun.Bot
             return null;
         }
 
-        public static async Task WriteEntry(string property, double val)
-			=> await WriteEntry(property, val.ToString());
+        private readonly string Path;
+        private readonly string ItemPath;
 
-        public static string Path { get; set; }
-        public static string ItemPath { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0067:Dispose objects before losing scope", Justification = "Visual Studio doesn't recognize IAsyncDisposable#DisposeAsync as a valid object disposal method")]
+        public async ValueTask DisposeAsync()
+        {
+            GC.SuppressFinalize(this);
+            if (File.Exists(Path) && File.Exists(ItemPath))
+                return;
+
+            await using (File.CreateText(Path));
+            await using (File.CreateText(ItemPath));
+            await File.WriteAllBytesAsync(Path, null);
+            await File.WriteAllBytesAsync(ItemPath, null);
+        }
+
+        /// <summary>
+        /// NOTE: this should never be used, as opposed to <see cref="DisposeAsync"/>, since literally every bot runtime operation is async, but it's a good coding
+        /// practice to implement <see cref="IDisposable"/> alongside <see cref="IAsyncDisposable"/> for consistency
+        /// </summary>
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            if (File.Exists(Path) && File.Exists(ItemPath))
+                return;
+
+            using (File.CreateText(Path));
+            using (File.CreateText(ItemPath));
+            lock (this)
+            {
+                File.WriteAllBytes(Path, null);
+                File.WriteAllBytes(ItemPath, null);
+            }
+        }
 	}
 }

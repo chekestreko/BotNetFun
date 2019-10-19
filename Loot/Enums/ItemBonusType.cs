@@ -1,7 +1,7 @@
 ﻿namespace BotNetFun.Loot.Enums
 {
     [System.Serializable]
-    public enum ItemBonusType : byte
+    public enum ItemExtraStatContext : byte
     {
         NoItemBonus = 0,
         MaxHealthBonus = 1,

@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-
-namespace BotNetFun.MetaEnemy
+﻿namespace BotNetFun.MetaEnemy
 {
-    using BotNetFun.Loot.MetaItem;
-
     public class Enemy
     {
         public string Name { get; private set; }

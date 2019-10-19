@@ -12,9 +12,8 @@ namespace BotNetFun.Loot.MetaItem
         public ItemContextInfo Info { get; private set; }
         public Rarity Rarity { get; private set; }
         public ItemType Type { get; private set; }
-        public ItemBonus Bonus { get; private set; }
+        public ItemBonusContext Bonus { get; private set; }
         public ItemExtraStat ExtraStat { get; private set; }
-        public ItemSet Set { get; private set; }
         public ItemEfficientClass EfficientClass { get; private set; }
         public ItemData Data { get; private set; }
 
@@ -24,9 +23,8 @@ namespace BotNetFun.Loot.MetaItem
             ItemContextInfo info = ItemContextInfo.None,
             Rarity rare = Rarity.None,
             ItemType ty = ItemType.None,
-            ItemBonus bo = null,
+            ItemBonusContext bo = ItemBonusContext.None,
             ItemExtraStat _st = null,
-            ItemSet _set = null,
             ItemEfficientClass ec = ItemEfficientClass.None,
             ItemData data = null
         )
@@ -35,9 +33,8 @@ namespace BotNetFun.Loot.MetaItem
             Info = info;
             Rarity = rare;
             Type = ty;
-            if (bo is null) Bonus = ItemBonus.NoBonus;
+            Bonus = bo;
             if (_st is null) ExtraStat = ItemExtraStat.NoExtraStat;
-            if (_set is null) Set = ItemSet.NoItemSet;
             EfficientClass = ec;
             if (data is null) Data = GetItemData(this, playerLevel);
         }
@@ -50,20 +47,12 @@ namespace BotNetFun.Loot.MetaItem
             double levelAsTenth = playerLevel * 0.01;
 
             ItemContextInfo randomContextInfo = GetRandomEnum<ItemContextInfo>();
-
             Rarity randomRarity = GetRandomEnum<Rarity>();
-            if (randomRarity != ItemBonus.NoBonus)
-            {
-                double rng = Globals.Rnd.NextDouble();
-            }
-
-
+            ItemBonusContext randomBonusContext = GetRandomEnum<ItemBonusContext>();
         }
 
         private static T GetRandomEnum<T>() where T : Enum
         {
-            if (!typeof(T).IsEnum)
-                throw new ArgumentException("Specified type parameter was not an enumeration", nameof(T));
             Array enumArray = Enum.GetValues(typeof(T));
             T random = (T)enumArray.GetValue(Globals.Rnd.Next(enumArray.Length));
 
@@ -130,7 +119,6 @@ namespace BotNetFun.Loot.MetaItem
                 }
             }
 
-            returnValue.Default();
             returnValue.ItemValue = RoundThenToInt(scaleMulti * rarityMultiplier);
 
             lock (item)

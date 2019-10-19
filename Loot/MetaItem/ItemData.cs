@@ -3,18 +3,10 @@
     [System.Serializable]
     public class ItemData
     {
-        public int Damage { get; set; } 
-        public int Defense { get; set; } 
-        public int CritChance { get; set; } 
-        public int CritDamage { get; set; } 
-        public double ItemValue { get; set; }
-
-        public void Default()
-        {
-            Damage = 0;
-            Defense = 0;
-            CritChance = 0;
-            CritDamage = 0;
-        }
+        public int Damage { get; set; } = 0;
+        public int Defense { get; set; } = 0;
+        public int CritChance { get; set; } = 0;
+        public int CritDamage { get; set; } = 0;
+        public double ItemValue { get; set; } = 0;
     }
 }

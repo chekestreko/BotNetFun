@@ -5,21 +5,21 @@
     [System.Serializable]
     public sealed class ItemExtraStat
     {
-        public ItemBonusType BonusAffect { get; private set; }
-        public ItemBonusType ExtraBonusAffect { get; private set; } = ItemBonusType.NoItemBonus;
+        public ItemExtraStatContext BonusAffect { get; private set; }
+        public ItemExtraStatContext ExtraBonusAffect { get; private set; } = ItemExtraStatContext.NoItemBonus;
         public int BonusContent { get; private set; }
         public int ExtraBonusContent { get; private set; } = 0;
         public bool MultiBonus { get; } = false;
 
-        public ItemExtraStat(ItemBonusType bonus, int content = 0, ItemBonusType extraBonus = ItemBonusType.NoItemBonus, int extraContent = 0)
+        public ItemExtraStat(ItemExtraStatContext bonus, int content = 0, ItemExtraStatContext extraBonus = ItemExtraStatContext.NoItemBonus, int extraContent = 0)
         {
             BonusAffect = bonus;
-            if (bonus == ItemBonusType.NoItemBonus) return;
-            if (bonus != ItemBonusType.NoItemBonus && content != 0)
+            if (bonus == ItemExtraStatContext.NoItemBonus) return;
+            if (bonus != ItemExtraStatContext.NoItemBonus && content != 0)
                 throw new System.InvalidOperationException("Item bonus is specified but content isn't specified");
 
             BonusContent = content;
-            if (extraBonus != ItemBonusType.NoItemBonus && extraBonus != bonus && extraContent != 0)
+            if (extraBonus != ItemExtraStatContext.NoItemBonus && extraBonus != bonus && extraContent != 0)
             {
                 ExtraBonusAffect = extraBonus;
                 ExtraBonusContent = extraContent;
@@ -28,18 +28,18 @@
         }
 
         public static ItemExtraStat HealthBonus(int health)
-            => new ItemExtraStat(ItemBonusType.MaxHealthBonus, health);
+            => new ItemExtraStat(ItemExtraStatContext.MaxHealthBonus, health);
 
         public static ItemExtraStat DodgeBonus(int dodgeChance)
-            => new ItemExtraStat(ItemBonusType.DodgeChanceBonus, dodgeChance);
+            => new ItemExtraStat(ItemExtraStatContext.DodgeChanceBonus, dodgeChance);
 
         /// <summary>
         /// NOTE: first parameter is health
         /// </summary>
         public static ItemExtraStat BothBonuses(int health, int dodgeChance)
-            => new ItemExtraStat(ItemBonusType.MaxHealthBonus, health, ItemBonusType.DodgeChanceBonus, dodgeChance);
+            => new ItemExtraStat(ItemExtraStatContext.MaxHealthBonus, health, ItemExtraStatContext.DodgeChanceBonus, dodgeChance);
 
         public static ItemExtraStat NoExtraStat
-            => new ItemExtraStat(ItemBonusType.NoItemBonus);
+            => new ItemExtraStat(ItemExtraStatContext.NoItemBonus);
     }
 }

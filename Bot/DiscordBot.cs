@@ -17,17 +17,28 @@ namespace BotNetFun.Bot
 
     public sealed class DiscordBot
     {
-        public static DiscordBot Bot { get; } = new DiscordBot();
+        public static DiscordBot BotClient {
+            get {
+                lock (_botClient)
+                {
+                    if (_botClient is null)
+                        _botClient = new DiscordBot();
+                    return _botClient;
+                }
+            }
+        }
+
+        private static DiscordBot _botClient = null;
 
         [MTAThread]
         private static async Task Main()
         {
             if (!Directory.Exists(Globals.SavePath))
                 Directory.CreateDirectory(Globals.SavePath);
-            await Bot.RunBotClient();
+            await BotClient.RunBotClient();
         }
-        
-        public DiscordBot()
+
+        private DiscordBot()
         {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             Configuration = new ConfigurationBuilder()
@@ -40,19 +51,24 @@ namespace BotNetFun.Bot
         public ServiceProvider Services { get; set; }
         public IConfigurationRoot Configuration { get; }
 
+        private bool isClientInitialized = false;
+
         public async Task RunBotClient()
         {
+            if (isClientInitialized == true) return;
+            isClientInitialized = true;
             Client = new DiscordShardedClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                MessageCacheSize = 2000,
+                MessageCacheSize = 500,
                 TotalShards = 3
             });
 
             CommandOperation = new CommandService(new CommandServiceConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                DefaultRunMode = RunMode.Async
+                DefaultRunMode = RunMode.Async,
+                CaseSensitiveCommands = false
             });
             
             Services = new ServiceCollection()
@@ -75,17 +91,8 @@ namespace BotNetFun.Bot
                 return Task.CompletedTask;
             };
 
-            await RegisterCommandsAsync();
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaTLYg.5oscD5pCzXDjqu_YjLPcAAIb7tc");
-            await Client.StartAsync();
-            await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
-            await Task.Delay(System.Threading.Timeout.Infinite);
-        }
-
-        private async Task RegisterCommandsAsync()
-        {
             Client.MessageReceived += async arg => {
-                SocketUserMessage message = (SocketUserMessage) arg;
+                SocketUserMessage message = arg as SocketUserMessage;
                 if (message is null || message.Author.IsBot) return;
                 int argumentPos = 0;
                 if (message.HasStringPrefix(@".", ref argumentPos) || message.HasMentionPrefix(Client.CurrentUser, ref argumentPos))
@@ -96,14 +103,20 @@ namespace BotNetFun.Bot
                     {
                         if (result.Error == CommandError.UnknownCommand)
                             return;
-                        
+
                         Console.WriteLine(result.ErrorReason);
                         await message.Channel.SendMessageAsync(result.ErrorReason);
                     }
                 }
             };
 
-            await CommandOperation.AddModulesAsync(Assembly.GetEntryAssembly(), Services); 
+            // Register commands
+            await CommandOperation.AddModulesAsync(Assembly.GetEntryAssembly(), Services);
+
+            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaTLYg.5oscD5pCzXDjqu_YjLPcAAIb7tc", true);
+            await Client.StartAsync();
+            await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
+            await Task.Delay(System.Threading.Timeout.Infinite);
         }
     }
 }
