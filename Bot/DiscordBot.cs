@@ -17,6 +17,8 @@ namespace BotNetFun.Bot
 
     public sealed class DiscordBot
     {
+        private const string @Token = "Put token here";
+
         public static DiscordBot BotClient {
             get {
                 lock (_botClient)
@@ -28,7 +30,7 @@ namespace BotNetFun.Bot
             }
         }
 
-        private static DiscordBot _botClient = null;
+        private static DiscordBot _botClient = new DiscordBot();
 
         [MTAThread]
         private static async Task Main()
@@ -92,8 +94,7 @@ namespace BotNetFun.Bot
             };
 
             Client.MessageReceived += async arg => {
-                SocketUserMessage message = arg as SocketUserMessage;
-                if (message is null || message.Author.IsBot) return;
+                if (!(arg is SocketUserMessage message) || message.Author.IsBot) return;
                 int argumentPos = 0;
                 if (message.HasStringPrefix(@".", ref argumentPos) || message.HasMentionPrefix(Client.CurrentUser, ref argumentPos))
                 {
@@ -113,7 +114,7 @@ namespace BotNetFun.Bot
             // Register commands
             await CommandOperation.AddModulesAsync(Assembly.GetEntryAssembly(), Services);
 
-            await Client.LoginAsync(TokenType.Bot, @"NjI3OTkxODc3MDUyMDA2NDAw.XaTLYg.5oscD5pCzXDjqu_YjLPcAAIb7tc", true);
+            await Client.LoginAsync(TokenType.Bot, @Token, true);
             await Client.StartAsync();
             await Client.SetGameAsync("tutorials on how to grind gold easily", type: ActivityType.Watching);
             await Task.Delay(System.Threading.Timeout.Infinite);

@@ -39,33 +39,104 @@ namespace BotNetFun.Loot.MetaItem
             if (data is null) Data = GetItemData(this, playerLevel);
         }
 
-        public static Item GetEmptyItem
-            => new Item("None", 0, ItemContextInfo.None, Rarity.None, ItemType.None);
+        public static Item GetEmptyItem { get; } = new Item("None", 0, ItemContextInfo.None, Rarity.None, ItemType.None);
+
         // todo: work on
-        public static Item RandomItem(byte playerLevel)
+        public static Item GenerateRandomItem(byte playerLevel)
         {
             double levelAsTenth = playerLevel * 0.01;
 
-            ItemContextInfo randomContextInfo = GetRandomEnum<ItemContextInfo>();
             Rarity randomRarity = GetRandomEnum<Rarity>();
+
+            if (randomRarity == Rarity.Developer || randomRarity == Rarity.None)
+                return GenerateRandomItem(playerLevel);
+
+            ItemContextInfo randomContextInfo = GetRandomEnum<ItemContextInfo>();
+            if (randomContextInfo == ItemContextInfo.None)
+                return GenerateRandomItem(playerLevel);
+
+            ItemType randomType = GetRandomEnum<ItemType>();
+            if (randomType == ItemType.None)
+                GenerateRandomItem(playerLevel);
+
             ItemBonusContext randomBonusContext = GetRandomEnum<ItemBonusContext>();
-        }
+            ItemEfficientClass randomEfficientClass = GetRandomEnum<ItemEfficientClass>();
+            ItemExtraStat randomExtraStat = GetRandomItemExtraStat(playerLevel);
+
+            if (playerLevel <= 84 && randomRarity == Rarity.Extraordinary)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 67 && randomRarity == Rarity.Mythical)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 54 && randomRarity == Rarity.Fabled)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 39 && randomRarity == Rarity.Legendary)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 26 && randomRarity == Rarity.Epic)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 17 && randomRarity == Rarity.Rare)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 12 && randomRarity == Rarity.Refined)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 7 && randomRarity == Rarity.Uncommon)
+                DecrementRarity(ref randomRarity);
+
+            if (playerLevel <= 3 && randomRarity == Rarity.Common)
+                DecrementRarity(ref randomRarity);
+
+            if (Globals.Rnd.NextDouble() - (levelAsTenth / 5) < levelAsTenth * 2 && randomRarity != Rarity.Extraordinary)
+                IncrementRarity(ref randomRarity);
+        } 
 
         private static T GetRandomEnum<T>() where T : Enum
-        {
-            Array enumArray = Enum.GetValues(typeof(T));
-            T random = (T)enumArray.GetValue(Globals.Rnd.Next(enumArray.Length));
+            => (T)Enum.GetValues(typeof(T)).GetValue(Globals.Rnd.Next(Enum.GetValues(typeof(T)).Length));
 
-            return random;
+        private static void DecrementRarity(ref Rarity rare)
+            => rare = (Rarity)((byte)rare - 1);
+
+        private static void IncrementRarity(ref Rarity rare)
+            => rare = (Rarity)((byte)rare + 1);
+
+        // todo: balancing fixes 
+        private static ItemExtraStat GetRandomItemExtraStat(byte playerLevel)
+        {
+            double levelAsTenth = playerLevel * 0.01;
+
+            int healthContext = RoundThenToInt(playerLevel * (Globals.Rnd.NextDouble() * 1.55));
+            int dodgeChanceContext = RoundThenToInt((Globals.Rnd.NextDouble() + (Globals.Rnd.NextDouble() - 0.10)) * ((levelAsTenth + 0.07) * 5));
+
+            double bonus1ScaleValidation = levelAsTenth * (1.243232 + (levelAsTenth / 1.22));
+            double bonus2ScaleValidation = levelAsTenth * (1.0810773 + (levelAsTenth / 1.32));
+
+            bool randomStatContext1Validation = Globals.Rnd.NextDouble() < bonus1ScaleValidation;
+            bool randomStatContext2Validation = Globals.Rnd.NextDouble() < bonus2ScaleValidation;
+
+            if (bonus1ScaleValidation > 1)
+                healthContext += RoundThenToInt(bonus1ScaleValidation - Math.Truncate(bonus1ScaleValidation));
+            if (bonus2ScaleValidation > 1)
+                dodgeChanceContext += RoundThenToInt(bonus2ScaleValidation - Math.Truncate(bonus2ScaleValidation));
+
+            if (randomStatContext1Validation == true && randomStatContext2Validation == false)
+                return ItemExtraStat.HealthBonus(healthContext);
+            else if (randomStatContext1Validation == false && randomStatContext2Validation == true)
+                return ItemExtraStat.DodgeBonus(dodgeChanceContext);
+            else if (randomStatContext1Validation == true && randomStatContext2Validation == true)
+                return ItemExtraStat.BothBonuses(healthContext, dodgeChanceContext);
+            else return ItemExtraStat.NoExtraStat;
         }
 
         private static ItemData GetItemData(Item item, byte playerLevel)
         {
             ItemData returnValue = new ItemData();
             double rarityMultiplier = 0;
-            double scaleMulti = (playerLevel * (Globals.ScaleMultiBase - (Globals.Rnd.NextDouble() + 0.1))) / 1.789;
+            double scaleMulti = playerLevel * (Globals.ScaleMultiBase - (Globals.Rnd.NextDouble() + 0.1)) / 1.789;
             double levelAsTenth = playerLevel * 0.01;
-
             lock (item)
             {
                 switch (item.Rarity)
@@ -116,6 +187,8 @@ namespace BotNetFun.Loot.MetaItem
                         break;
                     case Rarity.None:
                         return null;
+                    default:
+                        return null;
                 }
             }
 
@@ -131,20 +204,18 @@ namespace BotNetFun.Loot.MetaItem
                     case ItemContextInfo.NormalWeapon:
                         returnValue.Damage = RoundThenToInt(playerLevel / 2 * scaleMulti * rarityMultiplier);
                         returnValue.CritChance = RoundThenToInt((scaleMulti * rarityMultiplier * 1.14) + 0.18);
-                        returnValue.CritDamage = RoundThenToInt((scaleMulti * rarityMultiplier * 4.2));
+                        returnValue.CritDamage = RoundThenToInt(scaleMulti * rarityMultiplier * 4.2);
                         break;
                     case ItemContextInfo.NormalCharm:
                         double toChoose = Globals.Rnd.NextDouble();
-                        if (toChoose < 0.251)
+                        if (toChoose <= 0.251)
                             returnValue.Damage = RoundThenToInt(1.55 + (playerLevel / 4) * scaleMulti * rarityMultiplier);
-                        else if (toChoose > 0.252 && toChoose < 0.501)
+                        else if (toChoose > 0.252 && toChoose <= 0.501)
                             returnValue.Defense = RoundThenToInt(0.76 + (playerLevel / 5) * scaleMulti * rarityMultiplier);
-                        else if (toChoose > 0.502 && toChoose < 0.751)
+                        else if (toChoose > 0.502 && toChoose <= 0.751)
                             returnValue.CritChance = RoundThenToInt(0.63 + (playerLevel / 6) * scaleMulti * rarityMultiplier);
                         else if (toChoose > 0.752)
                             returnValue.CritDamage = RoundThenToInt(1.22 + (playerLevel / 4.5) * scaleMulti * rarityMultiplier);
-
-
                         break;
                 }
             }

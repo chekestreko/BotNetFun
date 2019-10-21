@@ -20,7 +20,7 @@ namespace BotNetFun.Bot
     // Commands
     public sealed class Commands : BotRuntime
     {
-        [RequireUserPermission(GuildPermission.Administrator)]
+        [RequireOwner]
         [Command("forceexit")]
         [Alias("exit")]
         private async Task ForceExit()

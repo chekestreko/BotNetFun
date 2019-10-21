@@ -37,7 +37,7 @@ namespace BotNetFun.Bot
         {
             if (!File.Exists(SaveJson))
             {
-                await using (File.CreateText(SaveJson)) ;
+                await using (File.CreateText(SaveJson));
                 await File.WriteAllTextAsync(SaveJson, "{}");
             }
             if (!File.Exists(SaveItemJson))
