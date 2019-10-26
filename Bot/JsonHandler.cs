@@ -98,8 +98,8 @@ namespace BotNetFun.Bot
             if (File.Exists(Path) && File.Exists(ItemPath))
                 return;
 
-            await using (File.CreateText(Path));
-            await using (File.CreateText(ItemPath));
+            await File.CreateText(Path).DisposeAsync();
+            await File.CreateText(ItemPath).DisposeAsync();
             await File.WriteAllBytesAsync(Path, null);
             await File.WriteAllBytesAsync(ItemPath, null);
         }
@@ -108,19 +108,7 @@ namespace BotNetFun.Bot
         /// NOTE: this should never be used, as opposed to <see cref="DisposeAsync"/>, since literally every bot runtime operation is async, but it's a good coding
         /// practice to implement <see cref="IDisposable"/> alongside <see cref="IAsyncDisposable"/> for consistency
         /// </summary>
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-            if (File.Exists(Path) && File.Exists(ItemPath))
-                return;
-
-            using (File.CreateText(Path));
-            using (File.CreateText(ItemPath));
-            lock (this)
-            {
-                File.WriteAllBytes(Path, null);
-                File.WriteAllBytes(ItemPath, null);
-            }
-        }
+        public void Dispose() =>
+            DisposeAsync().GetAwaiter().GetResult();
 	}
 }

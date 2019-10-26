@@ -2,39 +2,29 @@
 {
     public enum EnemyContextInfo : byte
     {
-        #region NormalContextInfo - Dual
         Normal = 0,
         NormalPlus = 1,
         NormalPlusPlus = 2,
-        LiterallyHarmless = 9,
-        #endregion 
+        LiterallyHarmless = 3,
 
-        #region TankyContextInfo - Health
-        Tough = 10,
-        Strong = 11,
-        Resilient = 12,
-        Turtle = 13,
-        #endregion
+        Tough = 4,
+        Strong = 5,
+        Resilient = 6,
+        Turtle = 7,
 
-        #region HurtfulContextInfo - Damage
-        Unkind = 20,
-        Harmful = 21,
-        Malicious = 22,
-        Destructive = 23,
-        #endregion HurtfulContextInfo - Damage
+        Unkind = 8,
+        Harmful = 9,
+        Malicious = 10,
+        Destructive = 11,
 
-        #region BigContextInfo - EliteOrBoss
-        DualBig = 30,
-        HealthBig = 31,
-        DamageBig = 32,
-        RaidDualBig = 33,
-        #endregion
+        DualBig = 12,
+        HealthBig = 13,
+        DamageBig = 14,
+        RaidDualBig = 15,
 
-        #region EndgameContextInfo
-        Legendary = 40,
-        Godlike = 50,
-        Impossible = 255
-        #endregion 
-
+        Legendary = 16,
+        Beastlike = 17,
+        Godlike = 18,
+        Impossible = 100,
     }
 }

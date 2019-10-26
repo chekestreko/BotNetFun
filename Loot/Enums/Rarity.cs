@@ -14,6 +14,6 @@
         Fabled = 8,
         Mythical = 9,
         Extraordinary = 10,
-        Developer = 255,
+        Developer = 20,
     }
 }

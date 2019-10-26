@@ -27,22 +27,20 @@ namespace BotNetFun.Bot
             return (PlayerLevel * PlayerLevel) + (PlayerLevel > 25 ? (PlayerLevel * 36.591) : (PlayerLevel * 18.2955));
         }
 
-        protected async Task<bool> HasInitialized()
-        {
-            string file = await File.ReadAllTextAsync(SaveJson);
-            return file.Contains("Class");
-        }
+        protected async Task<bool> HasInitialized() =>
+            (await File.ReadAllTextAsync(SaveJson)).Contains("Class");
+        
 
         protected async Task StarterSavefileIntegrity()
         {
             if (!File.Exists(SaveJson))
             {
-                await using (File.CreateText(SaveJson));
+                await File.CreateText(SaveJson).DisposeAsync();
                 await File.WriteAllTextAsync(SaveJson, "{}");
             }
             if (!File.Exists(SaveItemJson))
             {
-                await using (File.CreateText(SaveItemJson)) ;
+                await File.CreateText(SaveItemJson).DisposeAsync();
                 await File.WriteAllTextAsync(SaveItemJson, "{}");
             }
         }

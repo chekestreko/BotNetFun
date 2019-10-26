@@ -5,6 +5,7 @@ namespace BotNetFun.Loot.MetaItem
     using BotNetFun.Data;
     using BotNetFun.Loot.Enums;
 
+    // todo: names
     [Serializable]
     public sealed class Item
     {
@@ -19,7 +20,6 @@ namespace BotNetFun.Loot.MetaItem
 
         public Item(
             string _name,
-            byte playerLevel,
             ItemContextInfo info = ItemContextInfo.None,
             Rarity rare = Rarity.None,
             ItemType ty = ItemType.None,
@@ -36,18 +36,30 @@ namespace BotNetFun.Loot.MetaItem
             Bonus = bo;
             if (_st is null) ExtraStat = ItemExtraStat.NoExtraStat;
             EfficientClass = ec;
-            if (data is null) Data = GetItemData(this, playerLevel);
+            if (data is null) Data = ItemData.IncompleteItemData;
         }
 
-        public static Item GetEmptyItem { get; } = new Item("None", 0, ItemContextInfo.None, Rarity.None, ItemType.None);
+        // Constructor for quick creation of an item with itemdata using an item without itemdata
+        public Item(Item createdFrom, ItemData data)
+        {
+            Name = createdFrom.Name;
+            Info = createdFrom.Info;
+            Rarity = createdFrom.Rarity;
+            Type = createdFrom.Type;
+            Bonus = createdFrom.Bonus;
+            ExtraStat = createdFrom.ExtraStat;
+            EfficientClass = createdFrom.EfficientClass;
+            Data = data;
+        }
 
-        // todo: work on
-        public static Item GenerateRandomItem(byte playerLevel)
+        public static Item GetEmptyItem { get; } = new Item("None", ItemContextInfo.None, Rarity.None, ItemType.None);
+
+        // todo: names
+        public static Item GenerateRandomItem(byte playerLevel, bool efficientClass = false)
         {
             double levelAsTenth = playerLevel * 0.01;
 
             Rarity randomRarity = GetRandomEnum<Rarity>();
-
             if (randomRarity == Rarity.Developer || randomRarity == Rarity.None)
                 return GenerateRandomItem(playerLevel);
 
@@ -57,12 +69,53 @@ namespace BotNetFun.Loot.MetaItem
 
             ItemType randomType = GetRandomEnum<ItemType>();
             if (randomType == ItemType.None)
-                GenerateRandomItem(playerLevel);
+                return GenerateRandomItem(playerLevel);
+            
+            if ((randomType == ItemType.Helmet ||
+                randomType == ItemType.Chestplate ||
+                randomType == ItemType.Gauntlets ||
+                randomType == ItemType.Pants ||
+                randomType == ItemType.Boots) &&
+                (randomContextInfo != ItemContextInfo.NormalArmor ||
+                randomContextInfo != ItemContextInfo.OffensiveArmor ||
+                randomContextInfo != ItemContextInfo.TankyArmor))
+            {
+                if (randomContextInfo == ItemContextInfo.NormalCharm || randomContextInfo == ItemContextInfo.NormalWeapon)
+                    randomContextInfo = ItemContextInfo.NormalArmor;
+                else if (randomContextInfo == ItemContextInfo.StrongWeapon || randomContextInfo == ItemContextInfo.DamagingCharm)
+                    randomContextInfo = ItemContextInfo.OffensiveArmor;
+                else if (randomContextInfo == ItemContextInfo.ParryingWeapon || randomContextInfo == ItemContextInfo.ShieldingCharm)
+                    randomContextInfo = ItemContextInfo.TankyArmor;
+            } else if ((randomType == ItemType.Primary || randomType == ItemType.Secondary) &&
+                (randomContextInfo != ItemContextInfo.NormalWeapon ||
+                randomContextInfo != ItemContextInfo.ParryingWeapon ||
+                randomContextInfo != ItemContextInfo.StrongWeapon))
+            {
+                if (randomContextInfo == ItemContextInfo.NormalArmor || randomContextInfo == ItemContextInfo.NormalCharm)
+                    randomContextInfo = ItemContextInfo.NormalWeapon;
+                else if (randomContextInfo == ItemContextInfo.OffensiveArmor || randomContextInfo == ItemContextInfo.DamagingCharm)
+                    randomContextInfo = ItemContextInfo.StrongWeapon;
+                else if (randomContextInfo == ItemContextInfo.TankyArmor || randomContextInfo == ItemContextInfo.ShieldingCharm)
+                    randomContextInfo = ItemContextInfo.ParryingWeapon;
+            } else if ((randomType == ItemType.Charm) &&
+                (randomContextInfo != ItemContextInfo.NormalCharm ||
+                randomContextInfo != ItemContextInfo.DamagingCharm ||
+                randomContextInfo != ItemContextInfo.ShieldingCharm))
+            {
+                if (randomContextInfo == ItemContextInfo.NormalArmor || randomContextInfo == ItemContextInfo.NormalWeapon)
+                    randomContextInfo = ItemContextInfo.NormalCharm;
+                else if (randomContextInfo == ItemContextInfo.OffensiveArmor || randomContextInfo == ItemContextInfo.StrongWeapon)
+                    randomContextInfo = ItemContextInfo.DamagingCharm;
+                else if (randomContextInfo == ItemContextInfo.TankyArmor || randomContextInfo == ItemContextInfo.ParryingWeapon)
+                    randomContextInfo = ItemContextInfo.ShieldingCharm;
+            }
 
             ItemBonusContext randomBonusContext = GetRandomEnum<ItemBonusContext>();
-            ItemEfficientClass randomEfficientClass = GetRandomEnum<ItemEfficientClass>();
-            ItemExtraStat randomExtraStat = GetRandomItemExtraStat(playerLevel);
-
+            if (randomBonusContext != ItemBonusContext.None && playerLevel < Globals.Rnd.Next(0, 10) + Globals.Rnd.Next(0, 13))
+                randomBonusContext = ItemBonusContext.None;
+            else if (randomBonusContext == ItemBonusContext.None && playerLevel > 50)
+                randomBonusContext = GetRandomEnum<ItemBonusContext>();
+                    
             if (playerLevel <= 84 && randomRarity == Rarity.Extraordinary)
                 DecrementRarity(ref randomRarity);
 
@@ -92,6 +145,37 @@ namespace BotNetFun.Loot.MetaItem
 
             if (Globals.Rnd.NextDouble() - (levelAsTenth / 5) < levelAsTenth * 2 && randomRarity != Rarity.Extraordinary)
                 IncrementRarity(ref randomRarity);
+            
+            if ((randomContextInfo != ItemContextInfo.NormalArmor ||
+                 randomContextInfo != ItemContextInfo.NormalCharm ||
+                 randomContextInfo != ItemContextInfo.NormalWeapon) && playerLevel < Globals.Rnd.Next(0, 8) + Globals.Rnd.Next(0, 11))
+            {
+                if (randomType == ItemType.Helmet ||
+                    randomType == ItemType.Chestplate ||
+                    randomType == ItemType.Gauntlets ||
+                    randomType == ItemType.Pants ||
+                    randomType == ItemType.Boots)
+                    randomContextInfo = ItemContextInfo.NormalArmor;
+                else if (randomType == ItemType.Primary || randomType == ItemType.Secondary)
+                    randomContextInfo = ItemContextInfo.NormalWeapon;
+                else
+                    randomContextInfo = ItemContextInfo.NormalCharm;
+            }
+
+            Item toReturn = new Item (
+                // Implement random name list
+                "placeholdername",
+                randomContextInfo,
+                randomRarity,
+                randomType,
+                randomBonusContext,
+                GetRandomItemExtraStat(playerLevel), // Item extra stat
+                GetRandomEnum<ItemEfficientClass>(), // Item efficient class
+                ItemData.IncompleteItemData
+            );
+
+            return new Item(toReturn, GetItemData(toReturn, playerLevel, efficientClass));
+
         } 
 
         private static T GetRandomEnum<T>() where T : Enum
@@ -103,7 +187,6 @@ namespace BotNetFun.Loot.MetaItem
         private static void IncrementRarity(ref Rarity rare)
             => rare = (Rarity)((byte)rare + 1);
 
-        // todo: balancing fixes 
         private static ItemExtraStat GetRandomItemExtraStat(byte playerLevel)
         {
             double levelAsTenth = playerLevel * 0.01;
@@ -131,12 +214,12 @@ namespace BotNetFun.Loot.MetaItem
             else return ItemExtraStat.NoExtraStat;
         }
 
-        private static ItemData GetItemData(Item item, byte playerLevel)
+        private static ItemData GetItemData(Item item, byte playerLevel, bool efficientClass = false)
         {
             ItemData returnValue = new ItemData();
             double rarityMultiplier = 0;
             double scaleMulti = playerLevel * (Globals.ScaleMultiBase - (Globals.Rnd.NextDouble() + 0.1)) / 1.789;
-            double levelAsTenth = playerLevel * 0.01;
+
             lock (item)
             {
                 switch (item.Rarity)
@@ -192,14 +275,15 @@ namespace BotNetFun.Loot.MetaItem
                 }
             }
 
-            returnValue.ItemValue = RoundThenToInt(scaleMulti * rarityMultiplier);
+            returnValue.ItemValue += RoundThenToInt(scaleMulti * rarityMultiplier) / 8;
 
             lock (item)
             {
                 switch (item.Info)
                 {
                     case ItemContextInfo.NormalArmor:
-                        returnValue.Defense = RoundThenToInt(1 + (playerLevel / 2) * scaleMulti * rarityMultiplier);
+                        returnValue.Defense = RoundThenToInt(Globals.Rnd.Next(0, playerLevel / 6) + playerLevel / 4 + (playerLevel / 2) * scaleMulti * rarityMultiplier);
+                        returnValue.Damage = RoundThenToInt(playerLevel / 6) > 1 ? RoundThenToInt(playerLevel / 8) : 0;
                         break;
                     case ItemContextInfo.NormalWeapon:
                         returnValue.Damage = RoundThenToInt(playerLevel / 2 * scaleMulti * rarityMultiplier);
@@ -217,8 +301,49 @@ namespace BotNetFun.Loot.MetaItem
                         else if (toChoose > 0.752)
                             returnValue.CritDamage = RoundThenToInt(1.22 + (playerLevel / 4.5) * scaleMulti * rarityMultiplier);
                         break;
+                    case ItemContextInfo.TankyArmor:
+                        returnValue.Defense = RoundThenToInt((Globals.Rnd.Next(0, playerLevel / 4) + playerLevel) * scaleMulti * rarityMultiplier) + Globals.Rnd.Next(0, playerLevel);
+                        break;
+                    case ItemContextInfo.OffensiveArmor:
+                        returnValue.Defense = RoundThenToInt(playerLevel / 2 * scaleMulti * rarityMultiplier);
+                        returnValue.CritChance = RoundThenToInt((scaleMulti * rarityMultiplier * 0.59) + 0.06);
+                        returnValue.CritDamage = RoundThenToInt((scaleMulti * rarityMultiplier) / 3 * 1.45);
+                        break;
+                    case ItemContextInfo.ParryingWeapon:
+                        returnValue.Damage = RoundThenToInt(playerLevel / 1.6 * scaleMulti * rarityMultiplier);
+                        returnValue.CritChance = RoundThenToInt((scaleMulti * rarityMultiplier) + 0.12);
+                        returnValue.CritDamage = RoundThenToInt(scaleMulti * rarityMultiplier * 3.3);
+                        returnValue.Defense = RoundThenToInt(playerLevel / 3 * scaleMulti * rarityMultiplier);
+                        break;
+                    case ItemContextInfo.StrongWeapon:
+                        returnValue.Damage = RoundThenToInt(Globals.Rnd.Next(0, playerLevel / 3) + playerLevel / 3.6 + playerLevel / 1.9 * scaleMulti * rarityMultiplier);
+                        returnValue.CritChance = RoundThenToInt((scaleMulti * rarityMultiplier * 1.21) + 0.24);
+                        returnValue.CritDamage = RoundThenToInt(scaleMulti * rarityMultiplier * 4.787);
+                        break;
+                    case ItemContextInfo.DamagingCharm:
+                        returnValue.Damage = RoundThenToInt(1.989 + (playerLevel / 3.45) * scaleMulti * rarityMultiplier);
+                        returnValue.CritChance = RoundThenToInt(0.69 + (playerLevel / 5.6789) * scaleMulti * rarityMultiplier);
+                        returnValue.CritDamage = RoundThenToInt(1.556567 + (playerLevel / 4.2) * scaleMulti * rarityMultiplier);
+                        break;
+                    case ItemContextInfo.ShieldingCharm:
+                        returnValue.Defense = RoundThenToInt(1.43278 + (playerLevel / 4.45678901) * scaleMulti * rarityMultiplier);
+                        break;
+                    case ItemContextInfo.None:
+                        return null;
+                    default:
+                        return null; 
                 }
             }
+
+            if (efficientClass == true)
+            {
+                returnValue.CritChance += RoundThenToInt(returnValue.CritChance * Globals.ClassEfficiencyPercentBonus);
+                returnValue.CritDamage += RoundThenToInt(returnValue.CritDamage * Globals.ClassEfficiencyPercentBonus);
+                returnValue.Damage += RoundThenToInt(returnValue.Damage * Globals.ClassEfficiencyPercentBonus);
+                returnValue.Defense += RoundThenToInt(returnValue.Defense * Globals.ClassEfficiencyPercentBonus);
+                returnValue.ItemValue += returnValue.ItemValue * (Globals.ClassEfficiencyPercentBonus / 2);
+            }
+
             return returnValue;
         }
 

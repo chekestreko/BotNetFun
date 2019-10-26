@@ -1,5 +1,6 @@
 ﻿namespace BotNetFun.MetaEnemy
 {
+    // todo: random generation, actually finish this class, names
     public class Enemy
     {
         public string Name { get; private set; }

@@ -317,7 +317,7 @@ namespace BotNetFun.Bot
             await StarterSavefileIntegrity();
             if (!File.Exists(SaveJson))
             {
-                await using (File.CreateText(SaveJson));
+                await File.CreateText(SaveJson).DisposeAsync();
                 await File.WriteAllTextAsync(SaveJson, "{}");
             }
             if (!await HasInitialized())
