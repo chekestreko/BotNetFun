@@ -1,30 +1,34 @@
-﻿namespace BotNetFun.MetaEnemy
+﻿namespace BotNetFun.Enemy.Enums
 {
     public enum EnemyContextInfo : byte
     {
+        // Normal enemies
         Normal = 0,
         NormalPlus = 1,
         NormalPlusPlus = 2,
         LiterallyHarmless = 3,
 
+        // Tanky enemies
         Tough = 4,
         Strong = 5,
         Resilient = 6,
         Turtle = 7,
 
+        // Hurtful enemies
         Unkind = 8,
         Harmful = 9,
         Malicious = 10,
         Destructive = 11,
 
+        // Enemies which are "efficient in both"
         DualBig = 12,
-        HealthBig = 13,
-        DamageBig = 14,
-        RaidDualBig = 15,
+        RaidDualBig = 13,
 
-        Legendary = 16,
-        Beastlike = 17,
-        Godlike = 18,
+        // Midgame/High-midgame/Endgame
+        Myth = 14,
+        Legendary = 15,
+        Beastlike = 16,
+        Godlike = 17,
         Impossible = 100,
     }
 }

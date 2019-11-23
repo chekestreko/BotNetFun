@@ -4,7 +4,7 @@ namespace BotNetFun.Data
 {
     using BotNetFun.Loot.Enums;
     using BotNetFun.Loot.MetaItem;
-    // later maybe? using BotNetFun.MetaEnemy;
+    // later maybe? using BotNetFun.Enemy.MetaEnemy;
 
     public static class DataParsers
     {

@@ -13,8 +13,10 @@ using SnowynxHelpers.Extensions;
 namespace BotNetFun.Bot
 {
     using BotNetFun.Data;
+    using BotNetFun.Enemy.MetaEnemy;
     using BotNetFun.Loot.MetaItem;
-    using BotNetFun.MetaEnemy;
+    using BotNetFun.MainGame.Enums;
+    
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "Handled by Discord.NET to parse commands encapsulated as an async method via Command attribute")]
     // Commands
@@ -35,8 +37,8 @@ namespace BotNetFun.Bot
         private async Task Start()
         {
             await StarterSavefileIntegrity();
-            await using JsonHandler json = new JsonHandler(SaveJson, SaveItemJson);
-            if (await HasInitialized())
+            await using JsonHandler json = new JsonHandler(SaveJson);
+            if (await HasInitialized() == true)
             {
                 await ReplyAsync($"{Context.User.Username}, you already initialized. Use the `.help` command if you need help.");
                 return;
@@ -87,39 +89,40 @@ namespace BotNetFun.Bot
             }
             string starterclassstr = classQuestion.Content.RemoveWhitespace().ToLower();
             Item emptyItem = Item.GetEmptyItem;
-            await json.WriteItemEntry("Helmet", emptyItem);
-            await json.WriteItemEntry("Chestplate", emptyItem);
-            await json.WriteItemEntry("Gauntlet", emptyItem);
-            await json.WriteItemEntry("Pants", emptyItem);
-            await json.WriteItemEntry("Boots", emptyItem);
-            await json.WriteItemEntry("Primary", emptyItem);
-            await json.WriteItemEntry("Secondary", emptyItem);
-            await json.WriteItemEntry("Charm", emptyItem);
-            await json.WriteItemEntry("I1", emptyItem);
-            await json.WriteItemEntry("I2", emptyItem);
-            await json.WriteItemEntry("I3", emptyItem);
-            await json.WriteItemEntry("I4", emptyItem);
-            await json.WriteItemEntry("I5", emptyItem);
-            await json.WriteItemEntry("I6", emptyItem);
-            await json.WriteItemEntry("I7", emptyItem);
-            await json.WriteItemEntry("I8", emptyItem);
-            await json.WriteItemEntry("I9", emptyItem);
-            await json.WriteItemEntry("I10", emptyItem);
-            await json.WriteItemEntry("I11", emptyItem);
-            await json.WriteItemEntry("I12", emptyItem);
-            await json.WriteItemEntry("I13", emptyItem);
-            await json.WriteItemEntry("I14", emptyItem);
-            await json.WriteItemEntry("I15", emptyItem);
-            await json.WriteItemEntry("I16", emptyItem);
-            await json.WriteItemEntry("I17", emptyItem);
-            await json.WriteItemEntry("I18", emptyItem);
-            await json.WriteItemEntry("I19", emptyItem);
-            await json.WriteItemEntry("I20", emptyItem);
+            await json.WriteEntry(PlayerData.Helmet, emptyItem);
+            await json.WriteEntry(PlayerData.Chestplate, emptyItem);
+            await json.WriteEntry(PlayerData.Gauntlets, emptyItem);
+            await json.WriteEntry(PlayerData.Pants, emptyItem);
+            await json.WriteEntry(PlayerData.Boots, emptyItem);
+            await json.WriteEntry(PlayerData.PrimaryItem, emptyItem);
+            await json.WriteEntry(PlayerData.SecondaryItem, emptyItem);
+            await json.WriteEntry(PlayerData.Charm, emptyItem);
+            await json.WriteEntry(PlayerData.I1, emptyItem);
+            await json.WriteEntry(PlayerData.I2, emptyItem);
+            await json.WriteEntry(PlayerData.I3, emptyItem);
+            await json.WriteEntry(PlayerData.I4, emptyItem);
+            await json.WriteEntry(PlayerData.I5, emptyItem);
+            await json.WriteEntry(PlayerData.I6, emptyItem);
+            await json.WriteEntry(PlayerData.I7, emptyItem);
+            await json.WriteEntry(PlayerData.I8, emptyItem);
+            await json.WriteEntry(PlayerData.I9, emptyItem);
+            await json.WriteEntry(PlayerData.I10, emptyItem);
+            await json.WriteEntry(PlayerData.I11, emptyItem);
+            await json.WriteEntry(PlayerData.I12, emptyItem);
+            await json.WriteEntry(PlayerData.I13, emptyItem);
+            await json.WriteEntry(PlayerData.I14, emptyItem);
+            await json.WriteEntry(PlayerData.I15, emptyItem);
+            await json.WriteEntry(PlayerData.I16, emptyItem);
+            await json.WriteEntry(PlayerData.I17, emptyItem);
+            await json.WriteEntry(PlayerData.I18, emptyItem);
+            await json.WriteEntry(PlayerData.I19, emptyItem);
+            await json.WriteEntry(PlayerData.I20, emptyItem);
 
-            await json.WriteEntry("InBattle", false);
-            await json.WriteEntry("Gold", 5);
-            await json.WriteEntry("Level", 1);
-            await json.WriteEntry("XP", 0);
+            await json.WriteEntry(PlayerData.InBattle, emptyItem);
+            await json.WriteEntry(PlayerData.Gold, emptyItem);
+            await json.WriteEntry(PlayerData.Level, emptyItem);
+            await json.WriteEntry(PlayerData.XP, emptyItem);
+            await json.WriteEntry(PlayerData.CurrentLocation, emptyItem);
             switch (starterclassstr)
             {
                 case "barbarian":
@@ -127,7 +130,7 @@ namespace BotNetFun.Bot
                     SocketMessage confirm1 = await NextMessageAsync(timeout: timer);
                     if (confirm1.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await json.WriteEntry("Class", "Barbarian");
+                        await json.WriteEntry(PlayerData.Class, PlayerClass.Barbarian);
                         await ReplyAsync($"`Barbarian` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
                     }
                     else if (confirm1.Content.RemoveWhitespace().StartsWith('.'))
@@ -146,20 +149,20 @@ namespace BotNetFun.Bot
                         await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
                         return;
                     }
-                    await json.WriteEntry("MaxHealth", 20);
-                    await json.WriteEntry("Health", 20);
-                    await json.WriteEntry("DodgeChance", 2);
-                    await json.WriteEntry("Defense", 4);
-                    await json.WriteEntry("BaseDamage", 5);
-                    await json.WriteEntry("BaseCriticalChance", 6);
-                    await json.WriteEntry("BaseCriticalDamage", 20);
+                    await json.WriteEntry(PlayerData.MaxHealth, 20);
+                    await json.WriteEntry(PlayerData.Health, 20);
+                    await json.WriteEntry(PlayerData.DodgeChance, 2);
+                    await json.WriteEntry(PlayerData.Defense, 4);
+                    await json.WriteEntry(PlayerData.Damage, 5);
+                    await json.WriteEntry(PlayerData.CritChance, 6);
+                    await json.WriteEntry(PlayerData.CritDamage, 20);
                     break;
                 case "ninja":
                     await ReplyAsync("You picked the `Ninja` class! Please say `confirm` to confirm.");
                     SocketMessage confirm2 = await NextMessageAsync(timeout: timer); 
                     if (confirm2.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await json.WriteEntry("Class", "Ninja");
+                        await json.WriteEntry(PlayerData.Class, PlayerClass.Ninja);
                         await ReplyAsync($"`Ninja` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
                     }
                     else if (confirm2.Content.RemoveWhitespace().StartsWith('.'))
@@ -178,20 +181,20 @@ namespace BotNetFun.Bot
                         await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
                         return;
                     }
-                    await json.WriteEntry("MaxHealth", 9);
-                    await json.WriteEntry("Health", 9);
-                    await json.WriteEntry("DodgeChance", 6);
-                    await json.WriteEntry("Defense", 2);
-                    await json.WriteEntry("BaseDamage", 3);
-                    await json.WriteEntry("BaseCriticalChance", 12);
-                    await json.WriteEntry("BaseCriticalDamage", 45);
+                    await json.WriteEntry(PlayerData.MaxHealth, 9);
+                    await json.WriteEntry(PlayerData.Health, 9);
+                    await json.WriteEntry(PlayerData.DodgeChance, 6);
+                    await json.WriteEntry(PlayerData.Defense, 2);
+                    await json.WriteEntry(PlayerData.Damage, 3);
+                    await json.WriteEntry(PlayerData.CritChance, 12);
+                    await json.WriteEntry(PlayerData.CritDamage, 45);
                     break;
                 case "rogue":
                     await ReplyAsync("You picked the `Rogue` class! Please say `confirm` to confirm.");
                     SocketMessage confirm3 = await NextMessageAsync(timeout: timer);
                     if (confirm3.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await json.WriteEntry("Class", "Rogue");
+                        await json.WriteEntry(PlayerData.Class, PlayerClass.Rogue);
                         await ReplyAsync($"`Rogue` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
                     }
                     else if (confirm3.Content.RemoveWhitespace().StartsWith('.'))
@@ -210,20 +213,20 @@ namespace BotNetFun.Bot
                         await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
                         return;
                     }
-                    await json.WriteEntry("MaxHealth", 6);
-                    await json.WriteEntry("Health", 6);
-                    await json.WriteEntry("DodgeChance", 8);
-                    await json.WriteEntry("Defense", 1);
-                    await json.WriteEntry("BaseDamage", 2);
-                    await json.WriteEntry("BaseCriticalChance", 18);
-                    await json.WriteEntry("BaseCriticalDamage", 60);
+                    await json.WriteEntry(PlayerData.MaxHealth, 6);
+                    await json.WriteEntry(PlayerData.Health, 6);
+                    await json.WriteEntry(PlayerData.DodgeChance, 8);
+                    await json.WriteEntry(PlayerData.Defense, 1);
+                    await json.WriteEntry(PlayerData.Damage, 2);
+                    await json.WriteEntry(PlayerData.CritChance, 18);
+                    await json.WriteEntry(PlayerData.CritDamage, 60);
                     break;
                 case "knight":
                     await ReplyAsync("You picked the `Knight` class! Please say `confirm` to confirm.");
                     SocketMessage confirm4 = await NextMessageAsync(timeout: timer);
                     if (confirm4.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
                     {
-                        await json.WriteEntry("Class", "Knight");
+                        await json.WriteEntry(PlayerData.Class, PlayerClass.Knight);
                         await ReplyAsync($"`Knight` class confirmed. Welcome {Context.User.Username}! Use the `.help` command to get a list of commands!");
                     }
                     else if (confirm4.Content.RemoveWhitespace().StartsWith('.'))
@@ -242,14 +245,13 @@ namespace BotNetFun.Bot
                         await ReplyAsync("Input doesn't match `confirm`, class selection canceled (use the `.start` command to try again)");
                         return;
                     }
-
-                    await json.WriteEntry("MaxHealth", 15);
-                    await json.WriteEntry("Health", 15);
-                    await json.WriteEntry("DodgeChance", 4);
-                    await json.WriteEntry("Defense", 6);
-                    await json.WriteEntry("BaseDamage", 4);
-                    await json.WriteEntry("BaseCriticalChance", 8);
-                    await json.WriteEntry("BaseCriticalDamage", 30);
+                    await json.WriteEntry(PlayerData.MaxHealth, 15);
+                    await json.WriteEntry(PlayerData.Health, 15);
+                    await json.WriteEntry(PlayerData.DodgeChance, 4);
+                    await json.WriteEntry(PlayerData.Defense, 6);
+                    await json.WriteEntry(PlayerData.Damage, 4);
+                    await json.WriteEntry(PlayerData.CritChance, 8);
+                    await json.WriteEntry(PlayerData.CritDamage, 30);
                     break;
             }
         }
@@ -259,24 +261,36 @@ namespace BotNetFun.Bot
         private async Task GiveGold(IUser toGiveTo, double goldToGive)
         {
             await using JsonHandler toGetFrom = new JsonHandler(SaveJson);
-            double currentGold = await toGetFrom.GetData<double>("Gold");
+            double currentGold = await toGetFrom.GetData<double>(PlayerData.Gold);
             string toGiveToPath = $"{AppDomain.CurrentDomain.BaseDirectory}/SaveData/{toGiveTo.Id}.json";
+
             if (!File.Exists(toGiveToPath))
             {
                 await ReplyAsync($"Error: specified user ({toGiveTo.Username}) has not initialized yet");
+                return;
             }
-            string fileValidity = await File.ReadAllTextAsync(toGiveToPath);
-            if (!fileValidity.Contains("Class"))
+
+            if (await HasInitialized(toGiveToPath) == false)
             {
                 await ReplyAsync($"Error: specified user ({toGiveTo.Username}) has not initialized yet");
                 return;
-            } else if (currentGold < goldToGive)
+            }
+
+            if (currentGold < goldToGive)
             {
                 await ReplyAsync($"Error: you don't have enough gold ({currentGold}), compared to the amount you want to give ({goldToGive})");
                 return;
-            } else if (toGiveTo == null)
+            }
+
+            if (toGiveTo == null)
             {
                 await ReplyAsync($"Error: specified user doesn't seem to exist");
+                return;
+            }
+
+            if (await HasInitialized() == false)
+            {
+                await ReplyAsync("Please use the `.start` command first to initialize.");
                 return;
             }
             await ReplyAsync($"Giving {goldToGive} gold to {toGiveTo.Username}, please say `confirm` to confirm.");
@@ -284,9 +298,9 @@ namespace BotNetFun.Bot
             confirm = await NextMessageAsync(timeout: new TimeSpan(0, 0, 20));
             if (confirm.Content.RemoveWhitespace().Contains("confirm", StringComparison.OrdinalIgnoreCase))
             {
-                await toGetFrom.WriteEntry("Gold", currentGold - goldToGive);
+                await toGetFrom.WriteEntry(PlayerData.Gold, currentGold - goldToGive);
                 await using JsonHandler toGiveToJson = new JsonHandler(toGiveToPath);
-                await toGiveToJson.WriteEntry("Gold", await toGiveToJson.GetData<double>("Gold") + goldToGive);
+                await toGiveToJson.WriteEntry(PlayerData.Gold, await toGiveToJson.GetData<double>(PlayerData.Gold) + goldToGive);
                 await ReplyAsync($"Successfully gave {goldToGive} gold to {toGiveTo.Username}!");
                 return;
             }
@@ -307,25 +321,42 @@ namespace BotNetFun.Bot
             }
         }
 
+        [Command("mine")]
+        [Summary("Mine for gold (usually one gold per mining action, but there's a chance to get two instead)")]
+        private async Task GoldMine()
+        {
+            if (await HasInitialized() == false)
+            {
+                await ReplyAsync("Please use the `.start` command first to initialize.");
+                return;
+            }
+            await using JsonHandler playerMiningGold = new JsonHandler(SaveJson);
+            if (Globals.Rnd.NextDouble() < 0.67)
+                await playerMiningGold.WriteEntry(PlayerData.Gold, await playerMiningGold.GetData<double>(PlayerData.Gold) + 2);
+            else
+                await playerMiningGold.WriteEntry(PlayerData.Gold, await playerMiningGold.GetData<double>(PlayerData.Gold) + 1);
+            await ReplyAsync("Gold mined! (+1 gold)");
+        } 
+
         // TODO: actual encounter
         [Command("encounter")]
         [Alias("fight")]
         [Summary("Fight a random enemy...")]
         private async Task Encounter()
         {
-            await using JsonHandler json = new JsonHandler(SaveJson, SaveItemJson);
+            await using JsonHandler json = new JsonHandler(SaveJson);
             await StarterSavefileIntegrity();
             if (!File.Exists(SaveJson))
             {
                 await File.CreateText(SaveJson).DisposeAsync();
                 await File.WriteAllTextAsync(SaveJson, "{}");
             }
-            if (!await HasInitialized())
+            if (await HasInitialized() == false)
             {
                 await ReplyAsync("Please use the `.start` command first to initialize.");
                 return;
             }
-            await json.WriteEntry("InBattle", "true");
+            await json.WriteEntry(PlayerData.InBattle, true);
             EmbedBuilder encounterMessage = new EmbedBuilder
             {
                 Title = "Enemy Encounter",
@@ -342,7 +373,7 @@ namespace BotNetFun.Bot
             await Task.Delay(Globals.Rnd.Next(350, 850));
             await message.ModifyAsync(msg => msg.Embed = encounterMessage.Build());
             await Task.Delay(Globals.Rnd.Next(350, 450));
-            await json.WriteEntry("InBattle", "false");
+            await json.WriteEntry(PlayerData.InBattle, false);
         }
 
         [Command("help")]

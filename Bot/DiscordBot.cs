@@ -19,6 +19,7 @@ namespace BotNetFun.Bot
     {
         private const string @Token = "Put token here";
 
+        // Thread-safe DiscordBot client property
         public static DiscordBot BotClient {
             get {
                 lock (_botClient)
@@ -30,6 +31,7 @@ namespace BotNetFun.Bot
             }
         }
 
+        // backing field of BotClient property
         private static DiscordBot _botClient = new DiscordBot();
 
         [MTAThread]
@@ -42,6 +44,9 @@ namespace BotNetFun.Bot
 
         private DiscordBot()
         {
+            GC.KeepAlive(this);
+            GC.SuppressFinalize(this);
+            GC.AddMemoryPressure(24576);
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -53,12 +58,12 @@ namespace BotNetFun.Bot
         public ServiceProvider Services { get; set; }
         public IConfigurationRoot Configuration { get; }
 
-        private bool isClientInitialized = false;
+        private bool IsClientInitialized { get; set; } = false;
 
         public async Task RunBotClient()
         {
-            if (isClientInitialized == true) return;
-            isClientInitialized = true;
+            if (IsClientInitialized == true) return;
+            IsClientInitialized = true;
             Client = new DiscordShardedClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,

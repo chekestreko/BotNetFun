@@ -30,10 +30,14 @@
     <PackageReference Include="Discord.Net.Rest" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="MetaEnemy\" />
     <Folder Include="Loot\" />
     <Folder Include="Bot\" />
     <Folder Include="Data\" />
     <Folder Include="Loot\Enums\" />
+    <Folder Include="Enemy\" />
+    <Folder Include="Enemy\MetaEnemy\" />
+    <Folder Include="Enemy\Enums\" />
+    <Folder Include="MainGame\" />
+    <Folder Include="MainGame\Enums\" />
   </ItemGroup>
 </Project>

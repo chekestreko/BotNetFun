@@ -1,4 +1,4 @@
-﻿namespace BotNetFun.MetaEnemy
+﻿namespace BotNetFun.Enemy.Enums
 {
     public enum EnemyType : byte
     {
